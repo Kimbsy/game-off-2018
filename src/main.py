@@ -42,7 +42,7 @@ class MouseDisplay(cocos.layer.Layer):
         self.add(self.text)
 
     def update_text(self, x, y):
-        text = 'Mouse @ %d, %d' % (x, y)
+        text = 'Mouse @ %d, %d' % (x + 10, y + 10)
         self.text.element.text = text
         self.text.element.x = self.posx
         self.text.element.y = self.posy
