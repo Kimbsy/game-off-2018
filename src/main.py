@@ -31,10 +31,12 @@ class KeyDisplay(cocos.layer.Layer):
 
 class PicDisplay(cocos.layer.Layer):
     def __init__(self):
+        super(PicDisplay, self).__init__()
+
         sprite = cocos.sprite.Sprite('Mum.jpg')
         sprite.position = 320,240
-        sprite.scale = 1
-        self.add(sprite, z=2)
+        sprite.scale = 0.3
+        self.add(sprite, z=1)
 
 class MouseDisplay(cocos.layer.Layer):
 
@@ -71,4 +73,4 @@ class MouseDisplay(cocos.layer.Layer):
 
 
 director.init(resizable=True)
-director.run(cocos.scene.Scene(KeyDisplay(), MouseDisplay()))
+director.run(cocos.scene.Scene(KeyDisplay(), MouseDisplay(), PicDisplay()))
