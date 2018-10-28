@@ -38,7 +38,7 @@ class MouseDisplay(cocos.layer.Layer):
 
         self.posx = 100
         self.posy = 240
-        self.text = cocos.text.Label('No mouse events yet', x=self.posx, y=self.posy)
+        self.text = cocos.text.Label('No mice events yet', x=self.posx, y=self.posy)
         self.add(self.text)
 
     def update_text(self, x, y):
