@@ -29,6 +29,13 @@ class KeyDisplay(cocos.layer.Layer):
         self.keys_pressed.remove(key)
         self.update_text()
 
+class PicDisplay(cocos.layer.Layer):
+    def __init__(self):
+        sprite = cocos.sprite.Sprite('Mum.jpg')
+        sprite.position = 320,240
+        sprite.scale = 1
+        self.add(sprite, z=2)
+
 class MouseDisplay(cocos.layer.Layer):
 
     is_event_handler = True
