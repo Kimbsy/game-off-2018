@@ -34,7 +34,7 @@ class PicDisplay(cocos.layer.Layer):
         sprite = cocos.sprite.Sprite('Mum.jpg')
         sprite.position = 320,240
         sprite.scale = 1
-        self.add(sprite, z=1)
+        self.add(sprite, z=2)
 
 class MouseDisplay(cocos.layer.Layer):
 
