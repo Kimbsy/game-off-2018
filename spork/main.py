@@ -40,6 +40,7 @@ def gameloop():
 
     # Want to refactor this body into seperate functions.
     while not done:
+        #print(pygame.mouse.get_pressed())
 
         # Handle events.
         for event in pygame.event.get():
@@ -47,22 +48,30 @@ def gameloop():
                 done = True
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                s = top_draggable_sprite_at_point(event.pos)
-                if s:
-                    dragging = True
-                    dragged_sprite = s
-                    sprites.remove(s)
-                    sprites.append(s)
+                if event.button == 1: #if mouse left button
+                    s = top_draggable_sprite_at_point(event.pos)
+                    if s:
+                        dragging = True
+                        dragged_sprite = s
+                        sprites.remove(s)
+                        sprites.append(s)
+                if event.button == 2: #if mouse wheel button
+                    s = top_draggable_sprite_at_point(event.pos)
+                    if s:
+                        #pygame.transform.rotate(s.get_rect, 30) # <-- this needs to operate on a surface class not an ImageSprite
+                        print("Rotate")
 
             elif event.type == pygame.MOUSEBUTTONUP:
-                dragging = False
-                dragged_sprite = None
+                if event.button == 1:
+                    dragging = False
+                    dragged_sprite = None
 
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
                     pos = dragged_sprite.pos
                     rel = event.rel
                     dragged_sprite.pos = (pos[0] + rel[0], pos[1] + rel[1])
+            # elif event.type ==pygame.MOUSEWHE
         
         # Display.
         game_display.fill((0, 0, 0))
