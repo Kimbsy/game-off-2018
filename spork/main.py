@@ -1,32 +1,59 @@
 import pygame
 
 # Importing from sprites/base_sprites.py
-from sprites.base_sprites import ImageSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite
 
 # Initialise pygame stuff.
 pygame.init()
 clock = pygame.time.Clock()
-game_display = pygame.display.set_mode((750, 1000))
-pygame.display.set_caption('foo')
+game_surface = pygame.display.set_mode((750, 1000))
+pygame.display.set_caption('Spork')
 
-# Global list of sprites to display.
-sprites = [
+# Main group of sprites to display.
+all_sprites = pygame.sprite.Group()
+all_sprites.add(
     ImageSprite(300, 225, 'w.png'),
-    ImageSprite(490, 363, 'u.png'),
+    # ImageSprite(490, 363, 'u.png'), # Blue is added by a button click.
     ImageSprite(418, 587, 'b.png'),
     ImageSprite(182, 587, 'r.png'),
     ImageSprite(110, 363, 'g.png'),
-]
+)
+
+# Derpy on_click functions for buttons (should live somewhere more
+# sensible).
+def foo():
+    print("foo")
+def bar():
+    print("bar")
+def add_blue():
+    all_sprites.add(ImageSprite(490, 363, 'u.png'))
+
+# Add the buttons to the main sprite group.
+all_sprites.add(
+    ButtonSprite(50, 50, "print foo", foo),
+    ButtonSprite(50, 100, "print bar", bar),
+    ButtonSprite(50, 150, "add blue", add_blue),
+)
 
 def top_draggable_sprite_at_point(pos):
-    """Checks if there is a sprite in the global sprite
-    list under the mouse position which is draggable.
+    """Returns a sprite from the main sprite group containing the mouse
+    position which is draggable.
 
     Reverses the sprite list so it finds sprites which
     are 'on top' first.
     """
-    for sprite in reversed(sprites):
-        if sprite.is_draggable and sprite.get_rect().collidepoint(pos):
+    for sprite in reversed(all_sprites.sprites()):
+        if sprite.is_draggable and sprite.rect.collidepoint(pos):
+            return sprite
+
+def button_at_point(pos):
+    """Returns a sprite from the main sprite group containing the mouse
+    position which is of type ButtonSprite.
+
+    Buttons won't overlap so we don't need to reverse the group.
+    """
+    for sprite in all_sprites.sprites():
+        if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
             return sprite
 
 def gameloop():
@@ -48,18 +75,16 @@ def gameloop():
                 done = True
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1: #if mouse left button
-                    s = top_draggable_sprite_at_point(event.pos)
-                    if s:
-                        dragging = True
-                        dragged_sprite = s
-                        sprites.remove(s)
-                        sprites.append(s)
-                if event.button == 2: #if mouse wheel button
-                    s = top_draggable_sprite_at_point(event.pos)
-                    if s:
-                        #pygame.transform.rotate(s.get_rect, 30) # <-- this needs to operate on a surface class not an ImageSprite
-                        print("Rotate")
+                s = top_draggable_sprite_at_point(event.pos)
+                if s:
+                    dragging = True
+                    dragged_sprite = s
+                    all_sprites.remove(s)
+                    all_sprites.add(s)
+                
+                b = button_at_point(event.pos)
+                if b:
+                    b.on_click()
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -68,17 +93,11 @@ def gameloop():
 
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
-                    pos = dragged_sprite.pos
-                    rel = event.rel
-                    dragged_sprite.pos = (pos[0] + rel[0], pos[1] + rel[1])
-            # elif event.type ==pygame.MOUSEWHE
-        
+                    dragged_sprite.move(event.rel)
+
         # Display.
-        game_display.fill((0, 0, 0))
-
-        for sprite in sprites:
-            sprite.display(game_display)
-
+        game_surface.fill((0, 0, 0))
+        all_sprites.draw(game_surface)
         pygame.display.update()
     
 
