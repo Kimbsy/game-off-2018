@@ -1,1 +1,1 @@
-python src/main.py
+python3 spork/main.py
