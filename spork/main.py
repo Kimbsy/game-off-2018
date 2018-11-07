@@ -67,7 +67,6 @@ def gameloop():
 
     # Want to refactor this body into seperate functions.
     while not done:
-        #print(pygame.mouse.get_pressed())
 
         # Handle events.
         for event in pygame.event.get():
