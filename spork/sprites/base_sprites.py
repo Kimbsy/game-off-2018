@@ -61,6 +61,9 @@ class ImageSprite(BaseSprite):
         self.rect.x += move[0]
         self.rect.y += move[1]
 
+    def rotate90(self):
+        self.image = pygame.transform.rotate(self.image,90)
+
 class ButtonSprite(BaseSprite):
     """Sprite which displays as a clickable button with text.
     """
