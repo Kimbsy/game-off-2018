@@ -82,7 +82,7 @@ class ButtonSprite(BaseSprite):
         rendered_text = self.font.render(self.text, True, self.text_color)
         self.image.blit(rendered_text, (15, 0))
 
-    def on_click(self):
+    def on_click(self, game_state):
         """Invoke the on_click function.
         """
-        self.f()
+        return self.f(game_state)
