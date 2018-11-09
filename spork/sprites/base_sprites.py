@@ -58,6 +58,7 @@ class ImageSprite(BaseSprite):
         """Apply a translation the the position of this sprite's
         rect based on a mousemotion relative movement.
         """
+        #self.image.scroll(move[0], move[1])
         self.rect.x += move[0]
         self.rect.y += move[1]
 

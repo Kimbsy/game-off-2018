@@ -11,6 +11,8 @@ red = (255,0 ,0)
 brown = (139,69,19)
 dark_brown= (111,54,10)
 
+
+
 def switch_to_workshop(game_state):
     game_state.update({'active_screen': 'workshop_screen'})
     game_state.update({'screen_done': True})
@@ -22,14 +24,17 @@ def quit_game(game_state):
 def add_blue(game_state):
     splice_sprites.add(ImageSprite(490, 363, 'u.png'))
     return game_state
+def add_flower(game_state):
+    splice_sprites.add(ImageSprite(390, 263, 'data/pixel-flower.png'))
+    return game_state
 
-# Main group of sprites to display.
 splice_sprites = pygame.sprite.Group()
 splice_sprites.add(
     #ImageSprite(490, 363, 'u.png'),
-    ButtonSprite(50, 50, 'Workshop!', switch_to_workshop),
-    ButtonSprite(50, 100, 'QUIT', quit_game),
-    ButtonSprite(50, 150, "add blue", add_blue),
+    ButtonSprite((4*1000/28), 700, 'Workshop!', switch_to_workshop),
+    ButtonSprite(400/28, 600, 'QUIT', quit_game),
+    ButtonSprite(4000/28, 150, "add blue", add_blue),
+    ButtonSprite(4000/28, 250, "add blue", add_blue),
 )
 
 def top_draggable_sprite_at_point(pos):
@@ -56,13 +61,18 @@ def button_at_point(pos):
 def splicer_loop(game_state):
     """The splicer screen loop.
     """
+    display_width = game_state.get('screen_size')[0]
+    display_height = game_state.get('screen_size')[1]
+    game_surface = game_state.get('game_surface')
+    active_sprite1 = game_state.get('active_sprite1')
+    active_sprite2 = game_state.get('active_sprite2')
+    # Main group of sprites to display.
+    
 
     # Want to move these elsewhere/design them away.
     dragging = False
     dragged_sprite = None
-    display_width = game_state.get('screen_size')[0]
-    display_height = game_state.get('screen_size')[1]
-    game_surface = game_state.get('game_surface')
+    
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
@@ -83,6 +93,9 @@ def splicer_loop(game_state):
                 if event.button ==2:
                     if s:
                         s.rotate90()
+                if event.button ==3:
+                    if s:
+                        s.getbuffer()
                 
                 b = button_at_point(event.pos)
                 if b:
@@ -97,9 +110,10 @@ def splicer_loop(game_state):
                 if dragging:
                     dragged_sprite.move(event.rel)
 
+
         # Display.
         game_surface.fill(white)
-        pygame.draw.rect(game_surface, red, (display_width/6,display_height/6, display_width/5, display_height/5))
+        pygame.draw.rect(game_surface, red, (10*display_width/28,display_height/28, 16*display_width/28, 2*display_height/28))
         splice_sprites.draw(game_surface)
 
         pygame.display.update()
