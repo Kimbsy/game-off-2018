@@ -22,6 +22,7 @@ game_state = {
     'screen_size': (display_width,display_height),
     'active_sprite1': None,
     'active_sprite2': None,
+    'built_sprites': pygame.sprite.Group(),
 }
 
 done = False

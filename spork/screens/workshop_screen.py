@@ -1,4 +1,4 @@
-import pygame
+import pygame, os
 
 # Importing from sprites/base_sprites.py
 from sprites.base_sprites import ImageSprite, ButtonSprite
@@ -17,7 +17,7 @@ def quit_game(game_state):
 # Main group of sprites to display.
 all_sprites = pygame.sprite.Group()
 all_sprites.add(
-    ImageSprite(300, 225, 'w.png'),
+    ImageSprite(300, 225, os.getcwd() + '/data/pixel-components/' + 'pixel-spoon.png'),
     ButtonSprite(50, 50, 'Splice!', switch_to_splicer),
     ButtonSprite(50, 100, 'QUIT', quit_game),
 )

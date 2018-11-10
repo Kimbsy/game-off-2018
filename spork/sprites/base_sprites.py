@@ -1,5 +1,5 @@
-import pygame
-import os
+import pygame, os
+from inspect import signature
 
 class BaseSprite(pygame.sprite.Sprite):
     """The base sprite class contains useful common functionality.
@@ -46,7 +46,7 @@ class ImageSprite(BaseSprite):
     def init_image(self):
         # Load the image from file and get its size.
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        loaded_img = pygame.image.load(dir_path + '/../data/' + self.img_name)
+        loaded_img = pygame.image.load(self.img_name)
         size = loaded_img.get_size()
 
         # Create a surface containing the image with a transparent
@@ -76,6 +76,9 @@ class ButtonSprite(BaseSprite):
         self.text_color = (200, 200, 200)
         self.f = f
 
+        sig = signature(f)
+        self.no_args= len(sig.parameters)
+
         # Call the parent constructor.
         super(ButtonSprite, self).__init__(x, y)
 
@@ -86,7 +89,10 @@ class ButtonSprite(BaseSprite):
         rendered_text = self.font.render(self.text, True, self.text_color)
         self.image.blit(rendered_text, (15, 0))
 
-    def on_click(self, game_state):
+    def on_click(self, game_state, arg = None):
         """Invoke the on_click function.
         """
-        return self.f(game_state)
+        if self.no_args ==1:
+            return self.f(game_state)
+        if self.no_args ==2:
+            return self.f(game_state, arg)
