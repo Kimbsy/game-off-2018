@@ -1,9 +1,13 @@
 import pygame
+import os
+from helpers import *
 
 # Importing from sprites/base_sprites.py
-from sprites.base_sprites import ImageSprite, ButtonSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite, ThumbnailSprite
 
 pygame.init()
+
+
 
 def switch_to_splicer(game_state):
     game_state.update({'active_screen': 'splicer_screen'})
@@ -18,9 +22,30 @@ def quit_game(game_state):
 all_sprites = pygame.sprite.Group()
 all_sprites.add(
     ImageSprite(300, 225, 'w.png'),
+    ThumbnailSprite(50, 200, 'pixel-components/pixel-bike.png'),    
     ButtonSprite(50, 50, 'Splice!', switch_to_splicer),
     ButtonSprite(50, 100, 'QUIT', quit_game),
 )
+
+items = os.listdir(os.getcwd() + '/data/pixel-components')
+x = 50
+y = 10
+
+for item in items:
+
+    all_sprites.add(ThumbnailSprite(x, y, 'pixel-components/' + item))
+
+
+    y += 50
+    
+
+
+    item = item[6:-4]
+    print(item)
+
+
+
+
 
 def top_draggable_sprite_at_point(pos):
     """Returns a sprite from the main sprite group containing the mouse
