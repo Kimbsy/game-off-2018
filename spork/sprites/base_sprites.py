@@ -8,6 +8,9 @@ class BaseSprite(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super(BaseSprite, self).__init__()
 
+        self.x = x
+        self.y = y
+
         # Sprites are not draggable by default.
         self.is_draggable = False
 
@@ -58,6 +61,8 @@ class ImageSprite(BaseSprite):
         """Apply a translation the the position of this sprite's
         rect based on a mousemotion relative movement.
         """
+        self.x += move[0]
+        self.y += move[1]
         self.rect.x += move[0]
         self.rect.y += move[1]
 
@@ -67,11 +72,13 @@ class ButtonSprite(BaseSprite):
 
     def __init__(self, x, y, text, f, args):
         # Need to specify properties before init_img is called.
-        self.font = pygame.font.SysFont(None, 25)
         self.text = text
-        self.text_color = (200, 200, 200)
         self.f = f
         self.args = args
+
+        # Define button text font.
+        self.font = pygame.font.SysFont(None, 25)
+        self.text_color = (200, 200, 200)
 
         # Call the parent constructor.
         super(ButtonSprite, self).__init__(x, y)
@@ -87,3 +94,39 @@ class ButtonSprite(BaseSprite):
         """Invoke the on_click function.
         """
         return self.f(game_state, *self.args)
+
+class TextSprite(BaseSprite):
+    """Displays text wrapping lines within the bounding rectangle.
+    """
+
+    def __init__(self, x, y, w, h, text):
+        self.w = w
+        self.h = h
+        self.text = text
+
+        # Define button text font.
+        self.font = pygame.font.SysFont(None, 25)
+        self.text_color = (0, 0, 0)
+        
+        # Call the parent constructor.
+        super(TextSprite, self).__init__(x, y)
+
+    def init_image(self):
+        self.image = pygame.Surface((self.w, self.h), pygame.SRCALPHA, 32)
+        
+        split_text = [line.split(' ') for line in self.text.splitlines()]
+
+        x, y = (0, 0)
+        space = self.font.size(' ')[0]
+
+        for line in split_text:
+            for word in line:
+                word_surface = self.font.render(word, True, self.text_color)
+                word_width, word_height = word_surface.get_size()
+                if x + word_width > self.w:
+                    x = 0
+                    y += word_height
+                self.image.blit(word_surface, (x, y))
+                x += word_width + space
+            x = 0
+            y += word_height
