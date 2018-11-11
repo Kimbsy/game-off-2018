@@ -7,6 +7,7 @@ from screens.workshop_screen import workshop_loop
 # Initialise pygame stuff.
 pygame.init()
 clock = pygame.time.Clock()
+built_sprites =pygame.sprite.Group()
 display_width = 1000
 display_height = 700
 game_surface = pygame.display.set_mode((display_width, display_height))
@@ -22,7 +23,7 @@ game_state = {
     'screen_size': (display_width,display_height),
     'active_sprite1': None,
     'active_sprite2': None,
-    'built_sprites': pygame.sprite.Group(),
+    'built_sprites': built_sprites,
 }
 
 done = False

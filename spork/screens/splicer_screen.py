@@ -10,7 +10,17 @@ black= (0,0,0)
 red = (255,0 ,0, 0)
 brown = (139,69,19)
 dark_brown= (111,54,10)
+splice_sprites = pygame.sprite.Group()
 
+def load_buttons(game_state):
+    splice_sprites.add(
+    ButtonSprite((4000/28), 600, 'Workshop!', switch_to_workshop),
+    ButtonSprite(4000/28, 500, 'QUIT', quit_game),
+    ButtonSprite(4000/28, 150, "add pot", add_pot),
+    ButtonSprite(4000/28, 250, "add flower", add_flower),
+    ButtonSprite(4000/28, 350, "screenshot", screenshot),
+    )
+    return game_state
 
 def switch_to_workshop(game_state):
     game_state.update({'active_screen': 'workshop_screen'})
@@ -32,10 +42,11 @@ def screenshot(game_state, text):
     rect = pygame.Rect(10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28)
     sub = game_state.get('game_surface').subsurface(rect)
     pygame.image.save(sub, os.getcwd() + "/data/temp/" + text + ".png")
-
-    game_state.update({'built_sprites' : add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + text + ".png"))})
+    x= game_state.get('built_sprites')
+    x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + text + ".png"))
+    game_state.update({'built_sprites' : x})
     for i in game_state.get('built_sprites'):
-        print(self.img_name)
+        print(i.img_name)
 
     #print(game_state.get('built_sprites'))
 
@@ -44,15 +55,6 @@ def screenshot(game_state, text):
 
     return game_state
 
-splice_sprites = pygame.sprite.Group()
-splice_sprites.add(
-    #ImageSprite(490, 363, 'u.png'),
-    ButtonSprite((4000/28), 600, 'Workshop!', switch_to_workshop),
-    ButtonSprite(4000/28, 500, 'QUIT', quit_game),
-    ButtonSprite(4000/28, 150, "add blue", add_pot),
-    ButtonSprite(4000/28, 250, "add flower", add_flower),
-    ButtonSprite(4000/28, 350, "screenshot", screenshot),
-)
 
 def top_draggable_sprite_at_point(pos):
     """Returns a sprite from the main sprite group containing the mouse
@@ -83,6 +85,10 @@ def splicer_loop(game_state):
     game_surface = game_state.get('game_surface')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
+
+    splice_sprites.empty()
+
+    load_buttons(game_state)
     
     # Want to move these elsewhere/design them away.
     dragging = False
@@ -116,6 +122,9 @@ def splicer_loop(game_state):
                 if event.button ==2:
                     if s:
                         s.rotate90()
+                if event.button ==3:
+                    if s:
+                        s.scale()
                 
                 b = button_at_point(event.pos)
                 if b:
