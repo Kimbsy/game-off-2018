@@ -65,18 +65,19 @@ class ButtonSprite(BaseSprite):
     """Sprite which displays as a clickable button with text.
     """
 
-    def __init__(self, x, y, text, f):
+    def __init__(self, x, y, text, f, args):
         # Need to specify properties before init_img is called.
         self.font = pygame.font.SysFont(None, 25)
         self.text = text
         self.text_color = (200, 200, 200)
         self.f = f
+        self.args = args
 
         # Call the parent constructor.
         super(ButtonSprite, self).__init__(x, y)
 
     def init_image(self):
-        self.image = pygame.Surface([100, 20])
+        self.image = pygame.Surface((100, 20))
         self.image.fill((100, 100, 100))
         
         rendered_text = self.font.render(self.text, True, self.text_color)
@@ -85,4 +86,4 @@ class ButtonSprite(BaseSprite):
     def on_click(self, game_state):
         """Invoke the on_click function.
         """
-        return self.f(game_state)
+        return self.f(game_state, *self.args)
