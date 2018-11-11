@@ -99,7 +99,6 @@ def splicer_loop(game_state):
     color_active = (255,0,255)
     font = pygame.font.Font(None, 32)
     color = color_active
-    active = False
     text = ''
     
         # Want to refactor this body into seperate functions.
@@ -143,7 +142,6 @@ def splicer_loop(game_state):
                     dragged_sprite.move(event.rel)
 
             if event.type == pygame.KEYDOWN:
-                
                 if event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
                 else:

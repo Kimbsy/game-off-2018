@@ -99,3 +99,17 @@ class ButtonSprite(BaseSprite):
             return self.f(game_state)
         if self.no_args ==2:
             return self.f(game_state, arg)
+
+class InputBox:
+    """Input Boxes can be easily generated and managed as a single class.
+    """
+
+    def __init__(self, x, y, w, h, text =''):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = (0,0,255)
+        self.text = text
+        self.txt_surface = FONT.render (text, True, self.color)
+        self.active = False
+
+
+      
