@@ -136,6 +136,35 @@ class NewspaperSprite(BaseSprite):
             self.image.blit(review_text_box.image, (50, y_offset))
             y_offset += 50
 
+class MoneySprite(BaseSprite):
+    """This sprite count up the amount of money the player has made from
+    selling their product.
+    """
+
+    def __init__(self, x, y, profit):
+        self.profit = profit
+        self.current = 0.0
+        self.done = False
+        self.font = pygame.font.SysFont(None, 30)
+        self.text_color = (25, 180, 20)
+
+        # Call the parent constructor.
+        super(MoneySprite, self).__init__(x, y)
+
+    def init_image(self):
+        current_string = "£{0:.2f}".format(self.current)
+        self.image = self.font.render(current_string, True, self.text_color)
+
+    def update(self):
+        if (self.current < self.profit):
+            self.current += 0.01
+            self.init_image()
+        else:
+            self.done = True
+
+def sell(product):
+    return 15.66    # TODO: make this depend on the product.
+
 def result_loop(game_state):
     """The result screen loop.
     """
@@ -148,14 +177,23 @@ def result_loop(game_state):
         'total_cost': 10.45,
     }})
 
+    game_surface = game_state.get('game_surface')
+    product = game_state.get('latest_product')
+    company = game_state.get('company_name')
+
     # Main group of sprites to display.
     all_sprites = pygame.sprite.Group()
-    all_sprites.add(
-        NewspaperSprite(300, 150, game_state.get('company_name'), game_state.get('latest_product')),
-        ButtonSprite(50, 50, 'Awesome!', switch_to_screen, ['workshop_screen']),
-    )
+    all_sprites.add(NewspaperSprite(300, 150, company, product))
 
-    game_surface = game_state.get('game_surface')
+    # Done button, get's added after money is counted.
+    done_button = ButtonSprite(50, 50, 'Done!', switch_to_screen, ['workshop_screen'])
+    no_button = True
+
+    available_funds = game_state.get('available_funds')
+    profit = sell(product)
+    game_state.update({'available_funds': available_funds + profit})
+    money = MoneySprite(1150, 250, profit)
+    all_sprites.add(money)
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
@@ -169,6 +207,12 @@ def result_loop(game_state):
                 b = button_at_point(all_sprites, event.pos)
                 if b:
                     game_state = b.on_click(game_state)
+
+        # Update.
+        money.update()
+        if (no_button and money.done):
+            all_sprites.add(done_button)
+            no_button = False
 
         # Display.
         game_surface.fill((0, 0, 0))
