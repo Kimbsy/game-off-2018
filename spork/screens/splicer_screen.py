@@ -1,6 +1,9 @@
 import pygame, os
 
-# Importing from sprites/base_sprites.py
+# Import helper functions.
+from helpers import *
+
+# Import sprites.
 from sprites.base_sprites import ImageSprite, ButtonSprite
 
 pygame.init()
@@ -48,31 +51,10 @@ def screenshot(game_state, text):
     for i in game_state.get('built_sprites'):
         print(i.img_name)
 
-    switch_to_workshop(game_state)
-
-    return game_state
+    return switch_to_workshop(game_state)
 
 
-def top_draggable_sprite_at_point(pos):
-    """Returns a sprite from the main sprite group containing the mouse
-    position which is draggable.
 
-    Reverses the sprite list so it finds sprites which
-    are 'on top' first.
-    """
-    for sprite in reversed(splice_sprites.sprites()):
-        if sprite.is_draggable and sprite.rect.collidepoint(pos):
-            return sprite
-
-def button_at_point(pos):
-    """Returns a sprite from the main sprite group containing the mouse
-    position which is of type ButtonSprite.
-
-    Buttons won't overlap so we don't need to reverse the group.
-    """
-    for sprite in splice_sprites.sprites():
-        if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
-            return sprite
 
 def splicer_loop(game_state):
     """The splicer screen loop.
@@ -107,7 +89,7 @@ def splicer_loop(game_state):
                 quit_game(game_state)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                s = top_draggable_sprite_at_point(event.pos)
+                s = top_draggable_sprite_at_point(all_sprites, event.pos)
                 if event.button == 1:    
                     if s:
                         dragging = True
@@ -122,12 +104,9 @@ def splicer_loop(game_state):
                     if s:
                         s.scale()
                 
-                b = button_at_point(event.pos)
+                b = button_at_point(all_sprites, event.pos)
                 if b:
-                    if b.text == "screenshot":
-                        game_state = b.on_click(game_state, text)
-                    else:
-                        game_state = b.on_click(game_state)
+                    game_state = b.on_click(game_state)
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -156,8 +135,6 @@ def splicer_loop(game_state):
         input_box.w = width
         game_surface.blit(txt_surface, (input_box.x+5, input_box.y+5))
         pygame.draw.rect(game_surface, color, input_box, 2)
-
-        #print(os.getcwd())
 
         pygame.display.update()
 
