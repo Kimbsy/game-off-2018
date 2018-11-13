@@ -4,18 +4,40 @@ import pygame, os
 from helpers import *
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite, ThumbnailSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite
+
+class ThumbnailSprite(ImageSprite):
+    """Make thumbnails not draggable and small.
+    """
+
+    def __init__(self, x, y, img_name):
+        super(ThumbnailSprite, self).__init__(x, y, img_name)
+
+        self.is_draggable = False
+
+    def init_image(self):
+        # Load the image from file and scale it to thumbnail size.
+        loaded_img = pygame.image.load(self.img_name)
+        size = loaded_img.get_size()
+
+        # Create a surface containing the image with a transparent
+        # background.
+        self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
+
+        self.image.blit(loaded_img, (0, 0))
+
+        self.image = aspect_scale(self.image, (50, 50))
 
 pygame.init()
 
 def add_to_workbench(game_state, item_file):
 
-    if not game_state.get('left_item'):
-        game_state.update({'left_item': item_file})
+    if not game_state.get('active_sprite1'):
+        game_state.update({'active_sprite1': item_file})
         all_sprites.add(ImageSprite(200, 300, item_file))
 
-    elif not game_state.get('right_item'):
-        game_state.update({'right_item': item_file})
+    elif not game_state.get('active_sprite2'):
+        game_state.update({'active_sprite2': item_file})
         all_sprites.add(ImageSprite(400, 300, item_file))
 
     else:
@@ -25,8 +47,8 @@ def add_to_workbench(game_state, item_file):
 
 def remove_workbench_item(game_state):
 
-    game_state.update({'left_item': None})
-    #game_state.update({'right_item': None})
+    game_state.update({'active_sprite1': None})
+    #game_state.update({'active_sprite2': None})
 
     return game_state
 
@@ -55,7 +77,6 @@ for item in items:
     item_text = item[6:-4]
 
     all_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file]))
-
 
 def workshop_loop(game_state):
     """The workshop screen loop.

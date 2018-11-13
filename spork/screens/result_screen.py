@@ -214,14 +214,6 @@ def result_loop(game_state):
     """The result screen loop.
     """
 
-    # TODO: This is temporary, should be stored in game_state by splicer on submission.
-    game_state.update({'latest_product': {
-        'name': 'Roto-Raker 4000',
-        'img' : 'pixel-components/pixel-pot.png',
-        'components': ['rake', 'lawnmower'],
-        'total_cost': 10.45,
-    }})
-
     game_surface = game_state.get('game_surface')
     product = game_state.get('latest_product')
     company = game_state.get('company_name')

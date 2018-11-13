@@ -19,8 +19,8 @@ def load_buttons(game_state):
     splice_sprites.add(
     ButtonSprite((4000/28), 600, 'Workshop!', switch_to_workshop, []),
     ButtonSprite(4000/28, 500, 'QUIT', quit_game, []),
-    ButtonSprite(4000/28, 150, "add pot", add_pot, []),
-    ButtonSprite(4000/28, 250, "add flower", add_flower, []),
+    ButtonSprite(4000/28, 150, "add 1", add_1, []),
+    ButtonSprite(4000/28, 250, "add 2", add_2, []),
     ButtonSprite(4000/28, 350, "screenshot", screenshot, []),
     )
     return game_state
@@ -33,27 +33,33 @@ def quit_game(game_state):
     game_state.update({'quit': True})
     game_state.update({'screen_done': True})
     return game_state
-def add_pot(game_state):
-    splice_sprites.add(ImageSprite(490, 363, os.getcwd() + "/data/pixel-components/" + "pixel-pot.png"))
+def add_1(game_state):
+    splice_sprites.add(ImageSprite(490, 363, game_state.get('active_sprite1')))
     return game_state
-def add_flower(game_state):
-    splice_sprites.add(ImageSprite(390, 263, os.getcwd() + "/data/pixel-components/" + "pixel-flower.png"))
+def add_2(game_state):
+    splice_sprites.add(ImageSprite(390, 263, game_state.get('active_sprite2')))
     return game_state
-def screenshot(game_state, text):
+def screenshot(game_state):
+    new_name = game_state.get('new_sprite_name')
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
     rect = pygame.Rect(10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28)
     sub = game_state.get('game_surface').subsurface(rect)
-    pygame.image.save(sub, os.getcwd() + "/data/temp/" + text + ".png")
+    pygame.image.save(sub, os.getcwd() + "/data/temp/" + new_name + ".png")
     x= game_state.get('built_sprites')
-    x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + text + ".png"))
+    x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png"))
     game_state.update({'built_sprites' : x})
     for i in game_state.get('built_sprites'):
         print(i.img_name)
 
-    return switch_to_workshop(game_state)
+    game_state.update({'latest_product': {
+        'name': new_name,
+        'img': os.getcwd() + "/data/temp/" + new_name + ".png",
+        'components': [game_state.get('active_sprite1'), game_state.get('active_sprite2')],
+        'total_cost': 4000.3,
+    }})
 
-
+    return switch_to_screen(game_state, 'result_screen')
 
 
 def splicer_loop(game_state):
@@ -89,7 +95,7 @@ def splicer_loop(game_state):
                 quit_game(game_state)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                s = top_draggable_sprite_at_point(all_sprites, event.pos)
+                s = top_draggable_sprite_at_point(splice_sprites, event.pos)
                 if event.button == 1:    
                     if s:
                         dragging = True
@@ -104,8 +110,9 @@ def splicer_loop(game_state):
                     if s:
                         s.scale()
                 
-                b = button_at_point(all_sprites, event.pos)
+                b = button_at_point(splice_sprites, event.pos)
                 if b:
+                    game_state.update({'new_sprite_name': text}) # TODO: this is a little hacky.
                     game_state = b.on_click(game_state)
 
             elif event.type == pygame.MOUSEBUTTONUP:
