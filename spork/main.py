@@ -8,20 +8,24 @@ from screens.workshop_screen import workshop_loop
 # Initialise pygame stuff.
 pygame.init()
 clock = pygame.time.Clock()
-display_width = 1500
-display_height = 1000
+built_sprites = pygame.sprite.Group()
+display_width = 1000
+display_height = 700
 game_surface = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Spork')
 
 game_state = {
     'clock': clock,
     'game_surface': game_surface,
-    'active_screen': 'result_screen', # TODO: eventually will start at 'main_menu_screen'
-    'company_name': 'KimbCo',
+    'active_screen': 'workshop_screen', # TODO: eventually will start at 'main_menu_screen'
+    'company_name': 'KimbCass Inc.',
     'screen_done': False,
     'available_funds': 0.01,
-    'display_size': (display_width, display_height),
-    'quit': False
+    'quit': False,
+    'screen_size': (display_width, display_height),
+    'active_sprite1': None,
+    'active_sprite2': None,
+    'built_sprites': built_sprites,
 }
 
 done = False
