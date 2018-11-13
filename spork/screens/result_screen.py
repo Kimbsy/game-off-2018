@@ -1,4 +1,4 @@
-import pygame
+import pygame, os
 import random
 
 # Import helper functions.
@@ -90,9 +90,11 @@ class NewspaperSprite(BaseSprite):
     """This sprite contains the reviews of the product.
     """
 
-    def __init__(self, x, y, company, product):
+    def __init__(self, x, y, w, h, company, product):
         self.x = x
         self.y = y
+        self.w = w
+        self.h = h
         self.done = False
         self.company = company
         self.product = product
@@ -103,25 +105,33 @@ class NewspaperSprite(BaseSprite):
         super(NewspaperSprite, self).__init__(x, y)
 
     def init_image(self):
-        self.image = pygame.Surface((800, 500))
+        self.image = pygame.Surface((self.w, self.h))
         self.image.fill((150, 150, 150))
 
         name = self.product.get('name')
 
         # Display the article title.
         title = self.font.render(name, True, self.text_color)
-        self.image.blit(title, (300, 20))
+        pos = ((self.w * 0.5) - (title.get_size()[0] * 0.5), (self.h * 0.075))
+        self.image.blit(title, pos)
 
         # Generate a tagline.
         tagline_template = random.choice(tagline_templates)
         tagline_text = tagline_template.format(self.company, name)
-        tagline_text_box = TextSprite(self.x, self.y, 400, 300, tagline_text)
-        self.image.blit(tagline_text_box.image, (50, 75))
+        tagline_text_box = TextSprite(self.x,
+                                      self.y,
+                                      (self.w * 0.6),
+                                      (self.h * 0.9),
+                                      tagline_text)
+        self.image.blit(
+            tagline_text_box.image,
+            ((self.w * 0.05), (self.h * 0.2))
+        )
 
         # Display the product image.
         product_image = ImageSprite(0, 0, self.product.get('img'))
-        scaled_image = aspect_scale(product_image.image, (250, 250))
-        self.image.blit(scaled_image, (500, 50))
+        scaled_image = aspect_scale(product_image.image, ((self.w * 0.5), (self.h * 0.5)))
+        self.image.blit(scaled_image, ((self.w * 0.65) , (self.h * 0.2)))
 
         # Choose a type of review
         # TODO: in future, make this based on the quality of the product.
@@ -131,16 +141,22 @@ class NewspaperSprite(BaseSprite):
         
         # Display the reviews with their scores.
         reviews = get_reviews(review_type)
-        y_offset = 200
+        y_offset = self.h * 0.4
         for review in reviews:
             score = review.get('score')
             text = review.get('text') + '  ' + str(score) + '/10'
-            review_text_box = TextSprite(self.x, self.y, 400, 300, text)
-            self.image.blit(review_text_box.image, (50, y_offset))
+            review_text_box = TextSprite(
+                self.x,
+                self.y,
+                (self.w * 0.5),
+                (self.h * 0.5),
+                text
+            )
+            self.image.blit(review_text_box.image, ((self.w * 0.075), y_offset))
             y_offset += 50
 
         self.original_image = self.image
-        self.original_scale = (800, 500)
+        self.original_scale = (self.w, self.h)
         self.current_modifier = 0.004
         self.image = pygame.transform.scale(self.image, self.get_current_scale())
 
@@ -157,8 +173,8 @@ class NewspaperSprite(BaseSprite):
         original_w, original_h = self.original_scale
         current_w, current_h = self.get_current_scale()
         
-        x_offset = self.x + (original_w / 2) - (current_w / 2)
-        y_offset = self.y + (original_h / 2) - (current_h / 2)
+        x_offset = self.x + (original_w * 0.5) - (current_w * 0.5)
+        y_offset = self.y + (original_h * 0.5) - (current_h * 0.5)
 
         return (x_offset, y_offset)
 
@@ -208,30 +224,62 @@ class MoneySprite(BaseSprite):
             self.done = True
 
 def sell(product):
-    return round(random.uniform(1.0, 15.0), 2)    # TODO: make this depend on the product.
+    return round(random.uniform(1.0, 15.0), 2) # TODO: make this depend on the product.
 
 def result_loop(game_state):
     """The result screen loop.
     """
 
+    # TEST DATA
+    # game_state.update({'latest_product': {
+    #     'name': 'Roto-Raker 4000',
+    #     'img' : os.getcwd() + '/data/pixel-components/pixel-pot.png',
+    #     'components': ['rake', 'lawnmower'],
+    #     'total_cost': 10.45,
+    # }})
+
     game_surface = game_state.get('game_surface')
+    screen_size = game_state.get('screen_size')
+    screen_width = screen_size[0]
+    screen_height = screen_size[1]
     product = game_state.get('latest_product')
     company = game_state.get('company_name')
 
     # Main group of sprites to display.
     all_sprites = pygame.sprite.OrderedUpdates()
-    newspaper = NewspaperSprite(300, 150, company, product)
+    w = (screen_width * 0.6)
+    h = (screen_height * 0.6)
+    x = (screen_width - w) * 0.5
+    y = (screen_height - h) * 0.4
+    newspaper = NewspaperSprite(
+        x,
+        y,
+        w,
+        h,
+        company,
+        product
+    )
     all_sprites.add(newspaper)
 
     # Money counter, gets added after newspaper is done.
     available_funds = game_state.get('available_funds')
     profit = sell(product)
     game_state.update({'available_funds': available_funds + profit})
-    money = MoneySprite(1150, 250, profit)
+    money = MoneySprite(
+        (screen_width * 0.5),
+        (screen_height * 0.85),
+        profit
+    )
     no_money = True
 
     # Done button, gets added after money is counted.
-    done_button = ButtonSprite(50, 50, 'Done!', switch_to_screen, ['workshop_screen'])
+    done_button = ButtonSprite(
+        (screen_width * 0.05),
+        (screen_height * 0.05),
+        'Done!',
+        switch_to_screen,
+        ['workshop_screen']
+    )
     no_button = True
 
     # Want to refactor this body into seperate functions.
@@ -253,7 +301,7 @@ def result_loop(game_state):
 
 
         if (no_money and newspaper.done):
-            pygame.time.wait(800)
+            pygame.time.wait(400)
             all_sprites.add(money)
             no_money = False
         if (no_button and money.done):
