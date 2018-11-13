@@ -91,6 +91,9 @@ class NewspaperSprite(BaseSprite):
     """
 
     def __init__(self, x, y, company, product):
+        self.x = x
+        self.y = y
+        self.done = False
         self.company = company
         self.product = product
         self.font = pygame.font.SysFont(None, 25)
@@ -136,6 +139,48 @@ class NewspaperSprite(BaseSprite):
             self.image.blit(review_text_box.image, (50, y_offset))
             y_offset += 50
 
+        self.original_image = self.image
+        self.original_scale = (800, 500)
+        self.current_modifier = 0.004
+        self.image = pygame.transform.scale(self.image, self.get_current_scale())
+
+    def get_current_scale(self):
+        return (
+            int(self.original_scale[0] * self.current_modifier),
+            int(self.original_scale[1] * self.current_modifier)
+        )
+
+    def get_current_angle(self):
+        return 1080 * self.current_modifier
+
+    def get_current_pos_offset(self):
+        original_w, original_h = self.original_scale
+        current_w, current_h = self.get_current_scale()
+        
+        x_offset = self.x + (original_w / 2) - (current_w / 2)
+        y_offset = self.y + (original_h / 2) - (current_h / 2)
+
+        return (x_offset, y_offset)
+
+    def update(self):
+        """Increment the current scale modifier, then set the image to a
+        scaled version of the image.
+        """
+        if (self.current_modifier < 1.0):
+            self.current_modifier += 0.004
+            self.image = pygame.transform.rotozoom(
+                self.original_image,
+                self.get_current_angle(),
+                self.current_modifier
+            )
+            offset = self.get_current_pos_offset()
+            self.rect.x = offset[0]
+            self.rect.y = offset[1]
+        else:
+            self.current_modifier = 1.0
+            self.image = self.original_image
+            self.done = True
+
 class MoneySprite(BaseSprite):
     """This sprite count up the amount of money the player has made from
     selling their product.
@@ -163,7 +208,7 @@ class MoneySprite(BaseSprite):
             self.done = True
 
 def sell(product):
-    return 15.66    # TODO: make this depend on the product.
+    return round(random.uniform(1.0, 15.0), 2)    # TODO: make this depend on the product.
 
 def result_loop(game_state):
     """The result screen loop.
@@ -183,17 +228,19 @@ def result_loop(game_state):
 
     # Main group of sprites to display.
     all_sprites = pygame.sprite.Group()
-    all_sprites.add(NewspaperSprite(300, 150, company, product))
+    newspaper = NewspaperSprite(300, 150, company, product)
+    all_sprites.add(newspaper)
 
-    # Done button, get's added after money is counted.
-    done_button = ButtonSprite(50, 50, 'Done!', switch_to_screen, ['workshop_screen'])
-    no_button = True
-
+    # Money counter, gets added after newspaper is done.
     available_funds = game_state.get('available_funds')
     profit = sell(product)
     game_state.update({'available_funds': available_funds + profit})
     money = MoneySprite(1150, 250, profit)
-    all_sprites.add(money)
+    no_money = True
+
+    # Done button, gets added after money is counted.
+    done_button = ButtonSprite(50, 50, 'Done!', switch_to_screen, ['workshop_screen'])
+    no_button = True
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
@@ -209,7 +256,14 @@ def result_loop(game_state):
                     game_state = b.on_click(game_state)
 
         # Update.
-        money.update()
+        for sprite in all_sprites:
+            sprite.update()
+
+
+        if (no_money and newspaper.done):
+            pygame.time.wait(800)
+            all_sprites.add(money)
+            no_money = False
         if (no_button and money.done):
             all_sprites.add(done_button)
             no_button = False

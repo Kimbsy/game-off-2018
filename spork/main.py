@@ -16,7 +16,7 @@ pygame.display.set_caption('Spork')
 game_state = {
     'clock': clock,
     'game_surface': game_surface,
-    'active_screen': 'result_screen',     # TODO: eventually will start at 'main_menu_screen'
+    'active_screen': 'result_screen', # TODO: eventually will start at 'main_menu_screen'
     'company_name': 'KimbCo',
     'screen_done': False,
     'available_funds': 0.01,
