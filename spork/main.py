@@ -7,7 +7,7 @@ from screens.workshop_screen import workshop_loop
 # Initialise pygame stuff.
 pygame.init()
 clock = pygame.time.Clock()
-display_width = 700
+display_width = 1500
 display_height = 1000
 game_surface = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Spork')
@@ -18,7 +18,8 @@ game_state = {
     'active_screen': 'workshop_screen',
     'screen_done': False,
     'available_funds': 0.01,
-    'quit': False
+    'quit': False,
+    'screen_size': (display_width, display_height),
 }
 
 done = False
