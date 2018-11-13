@@ -1,13 +1,10 @@
-import pygame
-import os
+import pygame, os
 from helpers import *
 
 # Importing from sprites/base_sprites.py
 from sprites.base_sprites import ImageSprite, ButtonSprite, ThumbnailSprite
 
 pygame.init()
-
-
 
 def switch_to_splicer(game_state):
     game_state.update({'active_screen': 'splicer_screen'})
@@ -44,8 +41,6 @@ def remove_workbench_item(game_state):
 # Main group of sprites to display.
 all_sprites = pygame.sprite.Group()
 all_sprites.add(
-    #ImageSprite(300, 225, 'w.png'),
-    ThumbnailSprite(50, 200, 'pixel-components/pixel-bike.png'),    
     ButtonSprite(450, 250, 'Splice!', switch_to_splicer, []),
     ButtonSprite(50, 100, 'QUIT', quit_game, []),
     ButtonSprite(200, 300, 'X', remove_workbench_item, []),
@@ -58,7 +53,7 @@ y = 10
 
 for item in items:
 
-    item_file = 'pixel-components/' + item
+    item_file = os.getcwd() + '/data/pixel-components/' + item
 
     all_sprites.add(ThumbnailSprite(x, y, item_file))
 

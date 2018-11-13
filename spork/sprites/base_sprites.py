@@ -1,5 +1,5 @@
-import pygame
-import os
+import pygame, os
+from inspect import signature
 from helpers import *
 
 class BaseSprite(pygame.sprite.Sprite):
@@ -46,8 +46,7 @@ class ImageSprite(BaseSprite):
 
     def init_image(self):
         # Load the image from file and get its size.
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        loaded_img = pygame.image.load(dir_path + '/../data/' + self.img_name)
+        loaded_img = pygame.image.load(self.img_name)
         size = loaded_img.get_size()
 
         # Create a surface containing the image with a transparent
@@ -61,6 +60,12 @@ class ImageSprite(BaseSprite):
         """
         self.rect.x += move[0]
         self.rect.y += move[1]
+
+    def rotate90(self):
+        self.image = pygame.transform.rotate(self.image,90)
+
+    def scale(self):
+        self.image = pygame.transform.scale(self.image, (50,50))
 
 class ThumbnailSprite(ImageSprite):
     #Make thumbnails not draggable and small
@@ -109,3 +114,15 @@ class ButtonSprite(BaseSprite):
         """Invoke the on_click function.
         """
         return self.f(game_state, *self.args)
+
+class InputBox:
+    """Input Boxes can be easily generated and managed as a single class.
+    """
+
+    def __init__(self, x, y, w, h, text =''):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = (0,0,255)
+        self.text = text
+        self.txt_surface = FONT.render (text, True, self.color)
+        self.active = False
+
