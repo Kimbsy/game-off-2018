@@ -21,9 +21,9 @@ def add_blue(game_state):
 all_sprites = pygame.sprite.Group()
 all_sprites.add(
     ImageSprite(490, 363, 'u.png'),
-    ButtonSprite(50, 50, 'Workshop!', switch_to_workshop),
-    ButtonSprite(50, 100, 'QUIT', quit_game),
-    ButtonSprite(50, 150, "add blue", add_blue),
+    ButtonSprite(50, 50, 'Workshop!', switch_to_workshop, []),
+    ButtonSprite(50, 100, 'QUIT', quit_game, []),
+    ButtonSprite(50, 150, "add blue", add_blue, []),
 )
 
 def top_draggable_sprite_at_point(pos):
