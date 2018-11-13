@@ -20,7 +20,7 @@ game_state = {
     'screen_done': False,
     'available_funds': 0.01,
     'quit': False,
-    'screen_size': (display_width,display_height),
+    'screen_size': (display_width, display_height),
     'active_sprite1': None,
     'active_sprite2': None,
     'built_sprites': built_sprites,

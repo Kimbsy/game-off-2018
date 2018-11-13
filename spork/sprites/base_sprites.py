@@ -1,5 +1,6 @@
 import pygame, os
 from inspect import signature
+from helpers import *
 
 class BaseSprite(pygame.sprite.Sprite):
     """The base sprite class contains useful common functionality.
@@ -45,7 +46,6 @@ class ImageSprite(BaseSprite):
 
     def init_image(self):
         # Load the image from file and get its size.
-        dir_path = os.path.dirname(os.path.realpath(__file__))
         loaded_img = pygame.image.load(self.img_name)
         size = loaded_img.get_size()
 
@@ -58,7 +58,6 @@ class ImageSprite(BaseSprite):
         """Apply a translation the the position of this sprite's
         rect based on a mousemotion relative movement.
         """
-        #self.image.scroll(move[0], move[1])
         self.rect.x += move[0]
         self.rect.y += move[1]
 
@@ -68,19 +67,38 @@ class ImageSprite(BaseSprite):
     def scale(self):
         self.image = pygame.transform.scale(self.image, (50,50))
 
+class ThumbnailSprite(ImageSprite):
+    #Make thumbnails not draggable and small
+    def __init__(self, x, y, img_name):
+        super(ThumbnailSprite, self).__init__(x, y, img_name)
+
+        self.is_draggable = False
+
+    def init_image(self):
+        # Load the image from file and scale it to thumbnail size.
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        loaded_img = pygame.image.load(dir_path + '/../data/' + self.img_name)
+        size = loaded_img.get_size()
+
+        # Create a surface containing the image with a transparent
+        # background.
+        self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
+
+        self.image.blit(loaded_img, (0, 0))
+
+        self.image = aspect_scale(self.image, 50, 50)
+
 class ButtonSprite(BaseSprite):
     """Sprite which displays as a clickable button with text.
     """
 
-    def __init__(self, x, y, text, f):
+    def __init__(self, x, y, text, f, args):
         # Need to specify properties before init_img is called.
         self.font = pygame.font.SysFont(None, 25)
         self.text = text
         self.text_color = (200, 200, 200)
         self.f = f
-
-        sig = signature(f)
-        self.no_args= len(sig.parameters)
+        self.args = args
 
         # Call the parent constructor.
         super(ButtonSprite, self).__init__(x, y)
@@ -92,13 +110,10 @@ class ButtonSprite(BaseSprite):
         rendered_text = self.font.render(self.text, True, self.text_color)
         self.image.blit(rendered_text, (15, 0))
 
-    def on_click(self, game_state, arg = None):
+    def on_click(self, game_state):
         """Invoke the on_click function.
         """
-        if self.no_args ==1:
-            return self.f(game_state)
-        if self.no_args ==2:
-            return self.f(game_state, arg)
+        return self.f(game_state, *self.args)
 
 class InputBox:
     """Input Boxes can be easily generated and managed as a single class.
@@ -111,5 +126,3 @@ class InputBox:
         self.txt_surface = FONT.render (text, True, self.color)
         self.active = False
 
-
-      

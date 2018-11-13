@@ -14,11 +14,11 @@ splice_sprites = pygame.sprite.Group()
 
 def load_buttons(game_state):
     splice_sprites.add(
-    ButtonSprite((4000/28), 600, 'Workshop!', switch_to_workshop),
-    ButtonSprite(4000/28, 500, 'QUIT', quit_game),
-    ButtonSprite(4000/28, 150, "add pot", add_pot),
-    ButtonSprite(4000/28, 250, "add flower", add_flower),
-    ButtonSprite(4000/28, 350, "screenshot", screenshot),
+    ButtonSprite((4000/28), 600, 'Workshop!', switch_to_workshop, []),
+    ButtonSprite(4000/28, 500, 'QUIT', quit_game, []),
+    ButtonSprite(4000/28, 150, "add pot", add_pot, []),
+    ButtonSprite(4000/28, 250, "add flower", add_flower, []),
+    ButtonSprite(4000/28, 350, "screenshot", screenshot, []),
     )
     return game_state
 
@@ -47,9 +47,6 @@ def screenshot(game_state, text):
     game_state.update({'built_sprites' : x})
     for i in game_state.get('built_sprites'):
         print(i.img_name)
-
-    #print(game_state.get('built_sprites'))
-
 
     switch_to_workshop(game_state)
 
@@ -101,7 +98,7 @@ def splicer_loop(game_state):
     color = color_active
     text = ''
     
-        # Want to refactor this body into seperate functions.
+    # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
 
         # Handle events.
