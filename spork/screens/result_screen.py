@@ -219,7 +219,7 @@ def result_loop(game_state):
     company = game_state.get('company_name')
 
     # Main group of sprites to display.
-    all_sprites = pygame.sprite.Group()
+    all_sprites = pygame.sprite.OrderedUpdates()
     newspaper = NewspaperSprite(300, 150, company, product)
     all_sprites.add(newspaper)
 

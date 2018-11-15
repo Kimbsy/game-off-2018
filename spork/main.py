@@ -8,7 +8,7 @@ from screens.workshop_screen import workshop_loop
 # Initialise pygame stuff.
 pygame.init()
 clock = pygame.time.Clock()
-built_sprites = pygame.sprite.Group()
+built_sprites = pygame.sprite.OrderedUpdates()
 display_width = 1000
 display_height = 700
 game_surface = pygame.display.set_mode((display_width, display_height))
