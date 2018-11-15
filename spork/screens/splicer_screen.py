@@ -13,7 +13,7 @@ black= (0,0,0)
 red = (255,0 ,0, 0)
 brown = (139,69,19)
 dark_brown= (111,54,10)
-splice_sprites = pygame.sprite.Group()
+splice_sprites = pygame.sprite.OrderedUpdates()
 
 def load_buttons(game_state):
     splice_sprites.add(
