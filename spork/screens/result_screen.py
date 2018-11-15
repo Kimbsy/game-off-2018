@@ -1,5 +1,4 @@
-import pygame, os
-import random
+import pygame, os, random
 
 # Import helper functions.
 from helpers import *
@@ -8,6 +7,7 @@ from helpers import *
 from sprites.base_sprites import BaseSprite, ImageSprite, ButtonSprite, TextSprite
 
 pygame.init()
+pygame.mixer.init()
 
 tagline_templates = [
     "This week {0} released it's latest product: the {1}.",
@@ -202,12 +202,14 @@ class MoneySprite(BaseSprite):
     selling their product.
     """
 
-    def __init__(self, x, y, profit):
+    def __init__(self, x, y, profit, channel):
         self.profit = profit
         self.current = 0.0
         self.done = False
         self.font = pygame.font.SysFont(None, 30)
         self.text_color = (25, 180, 20)
+        self.channel = channel
+        self.sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/get_coin.wav')
 
         # Call the parent constructor.
         super(MoneySprite, self).__init__(x, y)
@@ -220,6 +222,7 @@ class MoneySprite(BaseSprite):
         if (self.current < self.profit):
             self.current += 0.01
             self.init_image()
+            self.channel.play(self.sound)
         else:
             self.done = True
 
@@ -242,6 +245,7 @@ def result_loop(game_state):
     screen_size = game_state.get('screen_size')
     screen_width = screen_size[0]
     screen_height = screen_size[1]
+    channel = game_state.get('mixer_channels')[0]
     product = game_state.get('latest_product')
     company = game_state.get('company_name')
 
@@ -268,7 +272,8 @@ def result_loop(game_state):
     money = MoneySprite(
         (screen_width * 0.5),
         (screen_height * 0.85),
-        profit
+        profit,
+        channel
     )
     no_money = True
 

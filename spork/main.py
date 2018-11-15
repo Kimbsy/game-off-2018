@@ -7,6 +7,7 @@ from screens.workshop_screen import workshop_loop
 
 # Initialise pygame stuff.
 pygame.init()
+pygame.mixer.init()
 clock = pygame.time.Clock()
 built_sprites = pygame.sprite.OrderedUpdates()
 display_width = 1200
@@ -17,6 +18,10 @@ pygame.display.set_caption('Spork')
 game_state = {
     'clock': clock,
     'game_surface': game_surface,
+    'mixer_channels': [
+        pygame.mixer.Channel(0),
+        pygame.mixer.Channel(1),
+    ],
     'active_screen': 'workshop_screen', # TODO: eventually will start at 'main_menu_screen'
     'company_name': 'KimbCass Inc.',
     'screen_done': False,

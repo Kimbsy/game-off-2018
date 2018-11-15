@@ -29,6 +29,7 @@ class ThumbnailSprite(ImageSprite):
         self.image = aspect_scale(self.image, (50, 50))
 
 pygame.init()
+pygame.mixer.init()
 
 def add_to_workbench(game_state, item_file):
 

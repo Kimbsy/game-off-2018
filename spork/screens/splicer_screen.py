@@ -1,4 +1,4 @@
-import pygame, os
+import pygame, os, random
 
 # Import helper functions.
 from helpers import *
@@ -7,6 +7,7 @@ from helpers import *
 from sprites.base_sprites import ImageSprite, ButtonSprite
 
 pygame.init()
+pygame.mixer.init()
 
 white= (255,255,255)
 black= (0,0,0)
@@ -40,6 +41,16 @@ def add_2(game_state):
     splice_sprites.add(ImageSprite(390, 263, game_state.get('active_sprite2')))
     return game_state
 def screenshot(game_state):
+    # Choose a sellotape sound and begin playing it.
+    sound_file = random.choice([
+        'sellotape_1.wav',
+        'sellotape_2.wav',
+        'sellotape_3.wav',
+    ])
+    sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/' + sound_file)
+    channel = game_state.get('mixer_channels')[0]
+    channel.play(sound)
+    
     new_name = game_state.get('new_sprite_name')
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
@@ -58,6 +69,10 @@ def screenshot(game_state):
         'components': [game_state.get('active_sprite1'), game_state.get('active_sprite2')],
         'total_cost': 4000.3,
     }})
+
+    # Wait for sellotape sound to finish.
+    while channel.get_busy():
+        pass
 
     return switch_to_screen(game_state, 'result_screen')
 
