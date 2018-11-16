@@ -6,8 +6,10 @@ from helpers import *
 # Import sprites.
 from sprites.base_sprites import ImageSprite, ButtonSprite
 
+pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
-pygame.mixer.init()
+pygame.mixer.quit() # Hack to stop sound lagging.
+pygame.mixer.init(22050, -16, 2, 1024)
 
 white= (255,255,255)
 black= (0,0,0)
@@ -47,9 +49,9 @@ def screenshot(game_state):
         'sellotape_2.wav',
         'sellotape_3.wav',
     ])
-    sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/' + sound_file)
-    channel = game_state.get('mixer_channels')[0]
-    channel.play(sound)
+    sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/' + sound_file)
+    channel = pygame.mixer.Channel(0)
+    channel.play(sellotape_sound)
     
     new_name = game_state.get('new_sprite_name')
     display_width = game_state.get('screen_size')[0]
@@ -83,6 +85,7 @@ def splicer_loop(game_state):
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
     game_surface = game_state.get('game_surface')
+    click = game_state.get('click_sound')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
 
@@ -127,6 +130,7 @@ def splicer_loop(game_state):
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
+                    click.play()
                     game_state.update({'new_sprite_name': text}) # TODO: this is a little hacky.
                     game_state = b.on_click(game_state)
 
