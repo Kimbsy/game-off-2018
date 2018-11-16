@@ -45,11 +45,11 @@ def add_2(game_state):
 def screenshot(game_state):
     # Choose a sellotape sound and begin playing it.
     sound_file = random.choice([
-        'sellotape_1.wav',
-        'sellotape_2.wav',
-        'sellotape_3.wav',
+        'sellotape_001.wav',
+        'sellotape_002.wav',
+        'sellotape_003.wav',
     ])
-    sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/' + sound_file)
+    sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
     channel = pygame.mixer.Channel(0)
     channel.play(sellotape_sound)
     
