@@ -78,7 +78,6 @@ def screenshot(game_state):
 
     return switch_to_screen(game_state, 'result_screen')
 
-
 def splicer_loop(game_state):
     """The splicer screen loop.
     """
@@ -103,7 +102,17 @@ def splicer_loop(game_state):
     font = pygame.font.Font(None, 32)
     color = color_active
     text = ''
-    
+
+    tool_sounds = [
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/hammering.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/impact_drill.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/knife.flac'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/ratchet.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/sharpen.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/welder.ogg'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/wood_saw.wav'),
+    ]
+
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
 
@@ -123,9 +132,11 @@ def splicer_loop(game_state):
 
                 if event.button ==2:
                     if s:
+                        random.choice(tool_sounds).play()
                         s.rotate90()
                 if event.button ==3:
                     if s:
+                        random.choice(tool_sounds).play()
                         s.scale()
                 
                 b = button_at_point(splice_sprites, event.pos)
