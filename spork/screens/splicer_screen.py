@@ -69,6 +69,10 @@ def screenshot(game_state):
         'total_cost': 4000.3,
     }})
 
+    # Wait for sellotape sound to finish.
+    while channel.get_busy():
+        pass
+
     return switch_to_screen(game_state, 'result_screen')
 
 
