@@ -1,4 +1,4 @@
-import pygame, os
+import pygame, os, random
 
 # Import helper functions.
 from helpers import *
