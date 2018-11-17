@@ -11,6 +11,7 @@ def quit_game(game_state):
     """
     game_state.update({'quit': True})
     game_state.update({'screen_done': True})
+    pygame.mixer.music.stop()
     return game_state
 
 def switch_to_screen(game_state, screen_name):
