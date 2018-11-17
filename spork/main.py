@@ -6,6 +6,7 @@ from screens.result_screen import result_loop
 from screens.splicer_screen import splicer_loop
 from screens.workshop_screen import workshop_loop
 
+
 # Initialise pygame stuff.
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()

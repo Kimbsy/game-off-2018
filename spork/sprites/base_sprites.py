@@ -3,6 +3,16 @@ import pygame, os
 # Import helper functions.
 from helpers import *
 
+def button_at_point(sprites, pos):
+    """Returns a sprite from the sprite group containing the mouse
+    position which is of type ButtonSprite.
+
+    Buttons won't overlap so we don't need to reverse the group.
+    """
+    for sprite in sprites.sprites():
+        if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
+            return sprite
+
 class BaseSprite(pygame.sprite.Sprite):
     """The base sprite class contains useful common functionality.
     """
@@ -59,8 +69,11 @@ class ImageSprite(BaseSprite):
         self.image.blit(loaded_img, (0, 0))
         self.origimage = self.image
         self.rotation = 0
-        self.orig_width = 1
-        self.scale = 1
+        # self.center_point = self.rect.center()
+        self.orig_width = size[0]
+        self.orig_height = size[1]
+        self.aspect_scale= self.orig_width / self.orig_height
+        self.scale = 100
 
     def move(self, move):
         """Apply a translation the the position of this sprite's
@@ -72,14 +85,53 @@ class ImageSprite(BaseSprite):
         self.rect.y += move[1]
 
     def rotate45(self):
-        self.rotation = self.rotation + 45
+        self.rotation = self.rotation + 90
+        #self.update_sprite()
+
+        orig_rect = self.image.get_rect()
+
+        print(orig_rect.center)
+        print(pygame.mouse.get_pos())
+
         self.image = pygame.transform.rotate(self.origimage, self.rotation)
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect(center = (orig_rect.center[1],orig_rect.center[0]))
+        # self.rect = orig_rect.copy()
+        # self.center = self.image.get_rect().center
+        # self.image = self.image.subsurface(self.rect).copy
+
+        # orig_rect = image.get_rect()
+        # rot_image = pygame.transform.rotate(image, angle)
+        # rot_rect = orig_rect.copy()
+        # rot_rect.center = rot_image.get_rect().center
+        # rot_image = rot_image.subsurface(rot_rect).copy
 
 
-    def scale(self):
-        self.image = pygame.transform.scale(self.image, (50,50))
+    def scale_down(self):
+        if self.scale - 2 > 0:
+            self.scale = self.scale - 2
+
+        self.update_sprite()
+
+    def scale_up(self):
+        self.scale += 2
+
+        self.update_sprite()
+
+    def update_sprite(self):
+
+        new_width = int((self.orig_width*self.scale) /100)
+        new_height =int((self.orig_height*self.scale)/100)
+
+
+        loc = self.image.get_rect().center
+        
+
+        tempimage = pygame.transform.rotate(self.origimage, self.rotation)
+        tempimage.get_rect().center = loc
+        self.image = aspect_scale( tempimage, (new_width, new_height))
+        self.image.get_rect().center = loc
         self.rect = self.image.get_rect()
+
 
 
 class ButtonSprite(BaseSprite):

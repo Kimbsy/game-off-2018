@@ -4,7 +4,7 @@ import pygame, os
 from helpers import *
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point
 
 class ThumbnailSprite(ImageSprite):
     """Make thumbnails not draggable and small.

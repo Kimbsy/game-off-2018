@@ -4,7 +4,7 @@ import pygame, os
 from helpers import *
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox
+from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point
 
 pygame.init()
 
@@ -37,7 +37,7 @@ def add_1(game_state):
     splice_sprites.add(ImageSprite(490, 363, game_state.get('active_sprite1')))
     return game_state
 def add_2(game_state):
-    splice_sprites.add(ImageSprite(390, 263, game_state.get('active_sprite2')))
+    splice_sprites.add(ImageSprite(390, 363, game_state.get('active_sprite2')))
     return game_state
 def screenshot(game_state):
     new_name = game_state.get('new_sprite_name')
@@ -90,6 +90,19 @@ def splicer_loop(game_state):
             s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
         else:
             s = None
+
+        if s:
+            hover_rects1 = [s.rect]
+            hover_rects2 = [pygame.Rect(s.rect.x -2, s.rect.y-2 , 10, 10 ),
+                            pygame.Rect(s.rect.x + s.rect.w -8 , s.rect.y -2, 10, 10 ), 
+                            pygame.Rect(s.rect.x + s.rect.w -8, s.rect.y + s.rect.h -8, 10, 10 ),
+                            pygame.Rect(s.rect.x -2, s.rect.y + s.rect.h -8, 10, 10 )
+                            ]
+
+
+        else:
+            hover_rects1 = []
+            hover_rects2 = []
         # Handle events.
         for event in pygame.event.get():
            
@@ -107,12 +120,10 @@ def splicer_loop(game_state):
                         active_input.toggle_active()
                         
 
-                if event.button ==2:
+                if event.button == 3:
                     if s:
                         s.rotate45()
-                if event.button ==3:
-                    if s:
-                        s.scale()
+                
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
@@ -127,22 +138,17 @@ def splicer_loop(game_state):
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
                     dragged_sprite.move(event.rel)
-                if s:
-                    hover_rects1 = [s.rect]
-                    hover_rects2 = [pygame.Rect(s.rect.x -2, s.rect.y-2 , 10, 10 ),
-                                    pygame.Rect(s.rect.x + s.rect.w -8 , s.rect.y -2, 10, 10 ), 
-                                    pygame.Rect(s.rect.x + s.rect.w -8, s.rect.y + s.rect.h -8, 10, 10 ),
-                                    pygame.Rect(s.rect.x -2, s.rect.y + s.rect.h -8, 10, 10 )
-                                    ]
-
-
-                else:
-                    hover_rects1 = []
-                    hover_rects2 = []
+                
             
             if active_input.active == True:      
-                active_input.event_handle(event)
-            
+                active_input.event_handle(event) #Input Box Class has inbuilt event handling function for key down events.
+            elif active_input.active == False:
+                if event.type == pygame.KEYDOWN:
+                    if s:
+                        if event.key == pygame.K_UP:
+                            s.scale_up()
+                        if event.key == pygame.K_DOWN:
+                            s.scale_down()
 
                 
         # Display.
