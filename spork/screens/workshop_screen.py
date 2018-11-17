@@ -66,17 +66,24 @@ def remove_workbench_item(game_state, side):
 
     return game_state
 
+def start_splicer(game_state):
+    if game_state.get('active_sprite1') and game_state.get('active_sprite2'):
+        return switch_to_screen(game_state, 'splicer_screen')
+
+    print ('You must have two items to splice')
+    return game_state
 
 # Main group of sprites to display.
 all_sprites = pygame.sprite.OrderedUpdates()
 left_sprite = pygame.sprite.OrderedUpdates()
 right_sprite = pygame.sprite.OrderedUpdates()
 all_sprites.add(
-    ButtonSprite(300, 50, 'Splice!', switch_to_screen, ['splicer_screen']),
+    ButtonSprite(300, 50, 'Splice!', start_splicer, []),
     ButtonSprite(300, 100, 'QUIT', quit_game, []),
     #ButtonSprite(200, 300, 'X', remove_workbench_item, []),
     #ButtonSprite(400, 300, 'X', remove_workbench_item, [right_sprite]),
 )
+
 
 items = os.listdir(os.getcwd() + '/data/pixel-components')
 x = 50
@@ -108,6 +115,8 @@ def workshop_loop(game_state):
     screen_width = size[0]
     screen_height = size[1]
 
+
+
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
 
@@ -117,29 +126,33 @@ def workshop_loop(game_state):
                 quit_game(game_state)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                s = top_draggable_sprite_at_point(all_sprites, event.pos)
-                if s:
-                    dragging = True
-                    dragged_sprite = s
-                    all_sprites.remove(s)
-                    all_sprites.add(s)
+                # s = top_draggable_sprite_at_point(all_sprites, event.pos)
+                # if s:
+                #     dragging = True
+                #     dragged_sprite = s
+                #     all_sprites.remove(s)
+                #     all_sprites.add(s)
                 
                 b = button_at_point(all_sprites, event.pos)
                 if b:
                     click.play()
                     game_state = b.on_click(game_state)
 
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
-                    dragging = False
-                    dragged_sprite = None
+            # elif event.type == pygame.MOUSEBUTTONUP:
+            #     if event.button == 1:
+            #         dragging = False
+            #         dragged_sprite = None
 
-            elif event.type == pygame.MOUSEMOTION:
-                if dragging:
-                    dragged_sprite.move(event.rel)
+            # elif event.type == pygame.MOUSEMOTION:
+            #     if dragging:
+            #         dragged_sprite.move(event.rel)
 
         # Display.
         game_surface.fill((0, 0, 0))
+
+        #rect = pygame.Rect(100, 100, 100, 100)
+        #pygame.draw.rect(game_surface, (255, 0, 0), (50,20,200,500), 10)
+
         all_sprites.draw(game_surface)
         left_sprite.draw(game_surface)
         right_sprite.draw(game_surface)
