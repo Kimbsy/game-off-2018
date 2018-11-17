@@ -1,5 +1,4 @@
-import pygame, os
-import random
+import pygame, os, random
 
 # Import helper functions.
 from helpers import *
@@ -7,7 +6,10 @@ from helpers import *
 # Import sprites.
 from sprites.base_sprites import BaseSprite, ImageSprite, ButtonSprite, TextSprite
 
+pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
+pygame.mixer.quit() # Hack to stop sound lagging.
+pygame.mixer.init(22050, -16, 2, 1024)
 
 tagline_templates = [
     "This week {0} released it's latest product: the {1}.",
@@ -208,6 +210,8 @@ class MoneySprite(BaseSprite):
         self.done = False
         self.font = pygame.font.SysFont(None, 30)
         self.text_color = (25, 180, 20)
+        self.channel = pygame.mixer.Channel(0)
+        self.coin_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/get_coin.wav')
 
         # Call the parent constructor.
         super(MoneySprite, self).__init__(x, y)
@@ -220,6 +224,7 @@ class MoneySprite(BaseSprite):
         if (self.current < self.profit):
             self.current += 0.01
             self.init_image()
+            self.channel.play(self.coin_sound)
         else:
             self.done = True
 
@@ -239,6 +244,7 @@ def result_loop(game_state):
     # }})
 
     game_surface = game_state.get('game_surface')
+    click = game_state.get('click_sound')
     screen_size = game_state.get('screen_size')
     screen_width = screen_size[0]
     screen_height = screen_size[1]
@@ -293,6 +299,7 @@ def result_loop(game_state):
             elif event.type == pygame.MOUSEBUTTONDOWN:                
                 b = button_at_point(all_sprites, event.pos)
                 if b:
+                    click.play()
                     game_state = b.on_click(game_state)
 
         # Update.

@@ -1,4 +1,4 @@
-import pygame, os
+import pygame, os, random
 
 # Import helper functions.
 from helpers import *
@@ -6,7 +6,10 @@ from helpers import *
 # Import sprites.
 from sprites.base_sprites import ImageSprite, ButtonSprite
 
+pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
+pygame.mixer.quit() # Hack to stop sound lagging.
+pygame.mixer.init(22050, -16, 2, 1024)
 
 white= (255,255,255)
 black= (0,0,0)
@@ -40,6 +43,16 @@ def add_2(game_state):
     splice_sprites.add(ImageSprite(390, 263, game_state.get('active_sprite2')))
     return game_state
 def screenshot(game_state):
+    # Choose a sellotape sound and begin playing it.
+    sound_file = random.choice([
+        'sellotape_001.wav',
+        'sellotape_002.wav',
+        'sellotape_003.wav',
+    ])
+    sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
+    channel = pygame.mixer.Channel(0)
+    channel.play(sellotape_sound)
+    
     new_name = game_state.get('new_sprite_name')
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
@@ -59,8 +72,11 @@ def screenshot(game_state):
         'total_cost': 4000.3,
     }})
 
-    return switch_to_screen(game_state, 'result_screen')
+    # Wait for sellotape sound to finish.
+    while channel.get_busy():
+        pass
 
+    return switch_to_screen(game_state, 'result_screen')
 
 def splicer_loop(game_state):
     """The splicer screen loop.
@@ -68,6 +84,7 @@ def splicer_loop(game_state):
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
     game_surface = game_state.get('game_surface')
+    click = game_state.get('click_sound')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
 
@@ -85,7 +102,17 @@ def splicer_loop(game_state):
     font = pygame.font.Font(None, 32)
     color = color_active
     text = ''
-    
+
+    tool_sounds = [
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/hammering.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/impact_drill.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/knife.flac'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/ratchet.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/sharpen.wav'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/welder.ogg'),
+        pygame.mixer.Sound(os.getcwd() + '/data/sounds/tools/wood_saw.wav'),
+    ]
+
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
 
@@ -105,13 +132,16 @@ def splicer_loop(game_state):
 
                 if event.button ==2:
                     if s:
+                        random.choice(tool_sounds).play()
                         s.rotate90()
                 if event.button ==3:
                     if s:
+                        random.choice(tool_sounds).play()
                         s.scale()
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
+                    click.play()
                     game_state.update({'new_sprite_name': text}) # TODO: this is a little hacky.
                     game_state = b.on_click(game_state)
 
