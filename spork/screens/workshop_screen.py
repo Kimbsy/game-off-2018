@@ -33,9 +33,10 @@ class ThumbnailSprite(ImageSprite):
 
         self.image = aspect_scale(self.image, (self.w, self.h))
 
-
-
+pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
+pygame.mixer.quit() # Hack to stop sound lagging.
+pygame.mixer.init(22050, -16, 2, 1024)
 
 def add_to_workbench(game_state, item_file):
 
@@ -67,9 +68,9 @@ def remove_workbench_item(game_state, side):
 
 
 # Main group of sprites to display.
-all_sprites = pygame.sprite.Group()
-left_sprite = pygame.sprite.Group()
-right_sprite = pygame.sprite.Group()
+all_sprites = pygame.sprite.OrderedUpdates()
+left_sprite = pygame.sprite.OrderedUpdates()
+right_sprite = pygame.sprite.OrderedUpdates()
 all_sprites.add(
     ButtonSprite(300, 50, 'Splice!', switch_to_screen, ['splicer_screen']),
     ButtonSprite(300, 100, 'QUIT', quit_game, []),
@@ -102,6 +103,7 @@ def workshop_loop(game_state):
     dragged_sprite = None
 
     game_surface = game_state.get('game_surface')
+    click = game_state.get('click_sound')
     size = game_state.get('screen_size')
     screen_width = size[0]
     screen_height = size[1]
@@ -124,6 +126,7 @@ def workshop_loop(game_state):
                 
                 b = button_at_point(all_sprites, event.pos)
                 if b:
+                    click.play()
                     game_state = b.on_click(game_state)
 
             elif event.type == pygame.MOUSEBUTTONUP:
