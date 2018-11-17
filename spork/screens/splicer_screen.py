@@ -4,7 +4,7 @@ import pygame, os
 from helpers import *
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox
 
 pygame.init()
 
@@ -13,8 +13,7 @@ black= (0,0,0)
 red = (255,0 ,0, 0)
 brown = (139,69,19)
 dark_brown= (111,54,10)
-splice_sprites = pygame.sprite.Group()
-hover_rects = []
+splice_sprites = pygame.sprite.OrderedUpdates()
 
 def load_buttons(game_state):
     splice_sprites.add(
@@ -42,6 +41,7 @@ def add_2(game_state):
     return game_state
 def screenshot(game_state):
     new_name = game_state.get('new_sprite_name')
+    print(new_name)
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
     rect = pygame.Rect(10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28)
@@ -50,6 +50,7 @@ def screenshot(game_state):
     x= game_state.get('built_sprites')
     x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png"))
     game_state.update({'built_sprites' : x})
+    
     for i in game_state.get('built_sprites'):
         print(i.img_name)
 
@@ -71,7 +72,10 @@ def splicer_loop(game_state):
     game_surface = game_state.get('game_surface')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
-    hover_rects= []
+    hover_rects1= []
+    hover_rects2 = []
+    active_input = InputBox(100, 100, 140,32 ,pygame.font.Font(None, 32) , (0,0,255), (255,255,0))
+
 
     splice_sprites.empty()
 
@@ -81,22 +85,14 @@ def splicer_loop(game_state):
     dragging = False
     dragged_sprite = None
 
-    input_box = pygame.Rect(100, 100, 140, 32)
-    color_inactive = (255,0,0)
-    color_active = (255,0,255)
-    font = pygame.font.Font(None, 32)
-    color = color_active
-    text = ''
-    
-    # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
-        
+        if pygame.mouse.get_pos():
+            s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
+        else:
+            s = None
         # Handle events.
         for event in pygame.event.get():
-            if pygame.mouse.get_pos():
-                s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
-            else:
-                s = None
+           
             if event.type == pygame.QUIT:
                 quit_game(game_state)
 
@@ -107,17 +103,20 @@ def splicer_loop(game_state):
                         dragged_sprite = s
                         splice_sprites.remove(s)
                         splice_sprites.add(s)
+                    if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
+                        active_input.toggle_active()
+                        
 
                 if event.button ==2:
                     if s:
-                        s.rotate90()
+                        s.rotate45()
                 if event.button ==3:
                     if s:
                         s.scale()
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
-                    game_state.update({'new_sprite_name': text}) # TODO: this is a little hacky.
+                    game_state.update({'new_sprite_name': active_input.text}) # TODO: this is a little hacky.
                     game_state = b.on_click(game_state)
 
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -129,33 +128,30 @@ def splicer_loop(game_state):
                 if dragging:
                     dragged_sprite.move(event.rel)
                 if s:
-                    hover_rects=[]
-                    hover_rects= [s.rect, pygame.Rect(s.rect.x, s.rect.y, 10, 10 )]
+                    hover_rects1 = [s.rect]
+                    hover_rects2 = [pygame.Rect(s.rect.x -2, s.rect.y-2 , 10, 10 ),
+                                    pygame.Rect(s.rect.x + s.rect.w -8 , s.rect.y -2, 10, 10 ), 
+                                    pygame.Rect(s.rect.x + s.rect.w -8, s.rect.y + s.rect.h -8, 10, 10 ),
+                                    pygame.Rect(s.rect.x -2, s.rect.y + s.rect.h -8, 10, 10 )
+                                    ]
 
 
                 else:
-                    hover_rects = []
-                    
+                    hover_rects1 = []
+                    hover_rects2 = []
+            
+            if active_input.active == True:      
+                active_input.event_handle(event)
+            
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_BACKSPACE:
-                    text = text[:-1]
-                else:
-                    text += event.unicode
                 
         # Display.
         game_surface.fill(dark_brown)
         pygame.draw.rect(game_surface, white, (10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28))
         splice_sprites.draw(game_surface)
-        draw_rects(hover_rects, game_surface, black, 4)
-
-
-        txt_surface = font.render(text, True, color)
-        # Resize the box if the text is too long.
-        width = max(200, txt_surface.get_width()+10)
-        input_box.w = width
-        game_surface.blit(txt_surface, (input_box.x+5, input_box.y+5))
-        pygame.draw.rect(game_surface, color, input_box, 2)
+        draw_rects(hover_rects1, game_surface, black, 2)
+        draw_rects(hover_rects2, game_surface, red, 0)
+        active_input.draw_input_box(game_state)
 
         pygame.display.update()
 

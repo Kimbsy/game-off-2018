@@ -57,6 +57,10 @@ class ImageSprite(BaseSprite):
         # background.
         self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
         self.image.blit(loaded_img, (0, 0))
+        self.origimage = self.image
+        self.rotation = 0
+        self.orig_width = 1
+        self.scale = 1
 
     def move(self, move):
         """Apply a translation the the position of this sprite's
@@ -67,9 +71,11 @@ class ImageSprite(BaseSprite):
         self.rect.x += move[0]
         self.rect.y += move[1]
 
-    def rotate90(self):
-        self.image = pygame.transform.rotate(self.image,45)
+    def rotate45(self):
+        self.rotation = self.rotation + 45
+        self.image = pygame.transform.rotate(self.origimage, self.rotation)
         self.rect = self.image.get_rect()
+
 
     def scale(self):
         self.image = pygame.transform.scale(self.image, (50,50))
@@ -141,13 +147,56 @@ class TextSprite(BaseSprite):
             x = 0
             y += word_height
 
-class InputBox:
+class InputBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
 
-    def __init__(self, x, y, w, h, text =''):
+    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text =''):
         self.rect = pygame.Rect(x, y, w, h)
-        self.color = (0,0,255)
+        self.colour = (0,0,255)
+        self.highlight_colour = active_colour
         self.text = text
-        self.txt_surface = FONT.render (text, True, self.color)
+        self.font = font
+        self.txt_surface = self.font.render (self.text, True, self.colour)
         self.active = False
+        self.highlightrect = pygame.Rect(x -2, y-2, w+4, h+4)
+
+    def add_character(self, char):
+        self.text = self.text + char
+        self.txt_surface = self.font.render (self.text, True, self.colour)
+        width = max(200, self.txt_surface.get_width()+10)
+        self.rect.w = width
+        self.highlightrect.w = width +4
+
+
+    def remove_character(self):
+        if len(self.text) >= 1:
+            self.text = self.text[:-1]
+            self.txt_surface = self.font.render (self.text, True, self.colour)
+
+      
+    def draw_input_box(self, game_state):
+        game_surface = game_state.get('game_surface') 
+        game_surface.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        pygame.draw.rect(game_surface, self.colour, self.rect, 2)
+        if self.active == True:
+            pygame.draw.rect(game_surface, self.highlight_colour, self.highlightrect, 2)
+        
+
+    def toggle_active(self):
+        if self.active == False:
+            self.active = True
+            return
+        if self.active == True:
+            self.active =  False
+            return
+
+    def event_handle(self, event):
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_BACKSPACE:
+                self.remove_character()
+
+            else:
+                self.add_character(event.unicode)
+
