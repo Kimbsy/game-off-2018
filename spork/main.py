@@ -12,7 +12,7 @@ pygame.init()
 pygame.mixer.quit() # Hack to stop sound lagging.
 pygame.mixer.init(22050, -16, 2, 1024)
 clock = pygame.time.Clock()
-built_sprites = pygame.sprite.Group()
+built_sprites = pygame.sprite.OrderedUpdates()
 display_width = 1200
 display_height = 675
 game_surface = pygame.display.set_mode((display_width, display_height))
