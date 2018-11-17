@@ -41,6 +41,15 @@ def add_2(game_state):
     splice_sprites.add(ImageSprite(390, 263, game_state.get('active_sprite2')))
     return game_state
 def screenshot(game_state):
+    # Choose a sellotape sound and begin playing it.
+    sound_file = random.choice([
+        'sellotape_001.wav',
+        'sellotape_002.wav',
+        'sellotape_003.wav',
+    ])
+    sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
+    channel = pygame.mixer.Channel(0)
+    channel.play(sellotape_sound)
     new_name = game_state.get('new_sprite_name')
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
@@ -69,9 +78,13 @@ def splicer_loop(game_state):
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
     game_surface = game_state.get('game_surface')
+    click = game_state.get('click_sound')
+    clock = game_state.get('clock')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
     hover_rects= []
+
+    toast_stack = game_state.get('toast_stack')
 
     splice_sprites.empty()
 
@@ -142,13 +155,19 @@ def splicer_loop(game_state):
                     text = text[:-1]
                 else:
                     text += event.unicode
-                
+                game_state
+
+        # Update.
+        toast_stack.update()
+
         # Display.
         game_surface.fill(dark_brown)
         pygame.draw.rect(game_surface, white, (10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28))
         splice_sprites.draw(game_surface)
         draw_rects(hover_rects, game_surface, black, 4)
 
+
+        toast_stack.draw(game_surface)
 
         txt_surface = font.render(text, True, color)
         # Resize the box if the text is too long.
@@ -158,5 +177,7 @@ def splicer_loop(game_state):
         pygame.draw.rect(game_surface, color, input_box, 2)
 
         pygame.display.update()
+
+        clock.tick(60)
 
     return game_state

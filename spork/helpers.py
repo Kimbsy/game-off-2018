@@ -74,3 +74,11 @@ def aspect_scale(img, target):
 def draw_rects(rect_list, game_surface, colour, fill):
     for rect in rect_list:
         pygame.draw.rect(game_surface, colour , rect, fill)
+
+def notify(game_state, level, text):
+    toast_stack = game_state.get('toast_stack')
+    screen_size = game_state.get('screen_size')
+    w = screen_size[0] * 0.5
+    h = screen_size[1] * 0.1
+    toast_stack.push({'level': level, 'text': text})
+    return game_state

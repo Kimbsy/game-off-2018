@@ -52,6 +52,7 @@ def add_to_workbench(game_state, item_file):
 
     else:
         print('You can only have 2 items')
+        game_state = notify(game_state, 'warn', 'You can only have 2 items')
 
     return game_state
 
@@ -110,12 +111,13 @@ def workshop_loop(game_state):
     dragged_sprite = None
 
     game_surface = game_state.get('game_surface')
+    clock = game_state.get('clock')
     click = game_state.get('click_sound')
     size = game_state.get('screen_size')
     screen_width = size[0]
     screen_height = size[1]
 
-
+    toast_stack = game_state.get('toast_stack')
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
@@ -147,6 +149,9 @@ def workshop_loop(game_state):
             #     if dragging:
             #         dragged_sprite.move(event.rel)
 
+        # Update.
+        toast_stack.update()
+
         # Display.
         game_surface.fill((0, 0, 0))
 
@@ -156,6 +161,9 @@ def workshop_loop(game_state):
         all_sprites.draw(game_surface)
         left_sprite.draw(game_surface)
         right_sprite.draw(game_surface)
+        toast_stack.draw(game_surface)
         pygame.display.update()
+
+        clock.tick(60)
 
     return game_state
