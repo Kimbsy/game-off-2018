@@ -25,6 +25,7 @@ game_state = {
     'active_screen': 'main_menu_screen',
     'screen_done': False,
     'company_name': 'KimbCass Inc.',
+    'screen_done': False,
     'available_funds': 0.01,
     'quit': False,
     'screen_size': (display_width, display_height),

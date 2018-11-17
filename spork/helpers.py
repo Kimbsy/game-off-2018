@@ -70,3 +70,7 @@ def aspect_scale(img, target):
             sy = by
 
     return pygame.transform.scale(img, (int(sx), int(sy)))
+
+def draw_rects(rect_list, game_surface, colour, fill):
+    for rect in rect_list:
+        pygame.draw.rect(game_surface, colour , rect, fill)
