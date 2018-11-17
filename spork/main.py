@@ -9,8 +9,8 @@ from screens.workshop_screen import workshop_loop
 pygame.init()
 clock = pygame.time.Clock()
 built_sprites = pygame.sprite.Group()
-display_width = 1000
-display_height = 700
+display_width = 1200
+display_height = 675
 game_surface = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Spork')
 

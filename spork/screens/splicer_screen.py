@@ -14,6 +14,7 @@ red = (255,0 ,0, 0)
 brown = (139,69,19)
 dark_brown= (111,54,10)
 splice_sprites = pygame.sprite.Group()
+hover_rects = []
 
 def load_buttons(game_state):
     splice_sprites.add(
@@ -70,6 +71,7 @@ def splicer_loop(game_state):
     game_surface = game_state.get('game_surface')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
+    hover_rects= []
 
     splice_sprites.empty()
 
@@ -88,14 +90,17 @@ def splicer_loop(game_state):
     
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
-
+        
         # Handle events.
         for event in pygame.event.get():
+            if pygame.mouse.get_pos():
+                s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
+            else:
+                s = None
             if event.type == pygame.QUIT:
                 quit_game(game_state)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                s = top_draggable_sprite_at_point(splice_sprites, event.pos)
                 if event.button == 1:    
                     if s:
                         dragging = True
@@ -123,18 +128,27 @@ def splicer_loop(game_state):
             elif event.type == pygame.MOUSEMOTION:
                 if dragging:
                     dragged_sprite.move(event.rel)
+                if s:
+                    hover_rects=[]
+                    hover_rects= [s.rect, pygame.Rect(s.rect.x, s.rect.y, 10, 10 )]
+
+
+                else:
+                    hover_rects = []
+                    
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     text = text[:-1]
                 else:
                     text += event.unicode
-                game_state
-
+                
         # Display.
-        game_surface.fill(white)
-        pygame.draw.rect(game_surface, red, (10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28))
+        game_surface.fill(dark_brown)
+        pygame.draw.rect(game_surface, white, (10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28))
         splice_sprites.draw(game_surface)
+        draw_rects(hover_rects, game_surface, black, 4)
+
 
         txt_surface = font.render(text, True, color)
         # Resize the box if the text is too long.

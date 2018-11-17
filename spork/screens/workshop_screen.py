@@ -56,9 +56,9 @@ def remove_workbench_item(game_state):
 # Main group of sprites to display.
 all_sprites = pygame.sprite.Group()
 all_sprites.add(
-    ButtonSprite(50, 50, 'Splice!', switch_to_screen, ['splicer_screen']),
-    ButtonSprite(50, 100, 'QUIT', quit_game, []),
-    ButtonSprite(200, 300, 'X', remove_workbench_item, []),
+    ButtonSprite(250, 50, 'Splice!', switch_to_screen, ['splicer_screen']),
+    ButtonSprite(250, 100, 'QUIT', quit_game, []),
+    ButtonSprite(250, 300, 'X', remove_workbench_item, []),
     #ButtonSprite(400, 300, 'X', remove_workbench_item, [right_sprite]),
 )
 
