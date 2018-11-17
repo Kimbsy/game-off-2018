@@ -45,7 +45,7 @@ while not done:
         pygame.mixer.music.fadeout(500)
         music = '/data/sounds/music/' + game_state.get('active_music')
         pygame.mixer.music.load(os.getcwd() + music)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(loops=-1)
 
     if game_state.get('quit'):
         done = True
