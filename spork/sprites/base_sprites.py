@@ -74,6 +74,7 @@ class ImageSprite(BaseSprite):
         self.orig_height = size[1]
         self.aspect_scale= self.orig_width / self.orig_height
         self.scale = 100
+        self.cropping = False # object cannot initially be deleted
 
     def move(self, move):
         """Apply a translation the the position of this sprite's
@@ -131,6 +132,14 @@ class ImageSprite(BaseSprite):
         self.image = aspect_scale( tempimage, (new_width, new_height))
         self.image.get_rect().center = loc
         self.rect = self.image.get_rect()
+
+    def toggle_cropping(self):
+        if self.cropping == False:
+            self.cropping = True
+            return
+        if self.cropping == True:
+            self.cropping =  False
+            return
 
 
 
@@ -198,6 +207,33 @@ class TextSprite(BaseSprite):
                 x += word_width + space
             x = 0
             y += word_height
+
+class ThumbnailSprite(ImageSprite):
+    """Make thumbnails not draggable and small.
+    """
+
+    def __init__(self, x, y, img_name, w, h):
+
+        self.w = w
+        self.h = h
+
+        super(ThumbnailSprite, self).__init__(x, y, img_name)
+
+        self.is_draggable = False
+
+
+    def init_image(self):
+        # Load the image from file and scale it to thumbnail size.
+        loaded_img = pygame.image.load(self.img_name)
+        size = loaded_img.get_size()
+
+        # Create a surface containing the image with a transparent
+        # background.
+        self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
+
+        self.image.blit(loaded_img, (0, 0))
+
+        self.image = aspect_scale(self.image, (self.w, self.h))
 
 class InputBox(object):
     """Input Boxes can be easily generated and managed as a single class.
