@@ -232,7 +232,7 @@ def splicer_loop(game_state):
         draw_rects(hover_rects2, game_surface, red, 0)
         active_input.draw_input_box(game_state)
 
-	toast_stack.draw(game_surface)
+        toast_stack.draw(game_surface)
 
         pygame.display.update()
 
