@@ -4,7 +4,7 @@ import pygame, os, random
 from helpers import *
 
 # Import sprites.
-from sprites.base_sprites import BaseSprite, ImageSprite, ButtonSprite, TextSprite
+from sprites.base_sprites import BaseSprite, ImageSprite, ButtonSprite, button_at_point, TextSprite
 
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
