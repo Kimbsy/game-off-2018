@@ -4,32 +4,12 @@ import pygame, os
 from helpers import *
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite
-
-class ThumbnailSprite(ImageSprite):
-    #Make images not draggable and sized to specification
-    def __init__(self, x, y, img_name, w, h):
-        self.w = w
-        self.h = h
-        super(ThumbnailSprite, self).__init__(x, y, img_name)
-        self.is_draggable = False
-
-    def init_image(self):
-        # Load the image from file and scale it to thumbnail size.
-        loaded_img = pygame.image.load(self.img_name)
-        size = loaded_img.get_size()
-
-        # Create a surface containing the image with a transparent
-        # background.
-        self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
-        self.image.blit(loaded_img, (0, 0))
-        self.image = aspect_scale(self.image, (self.w, self.h))
+from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point, ThumbnailSprite
 
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
 pygame.mixer.quit() # Hack to stop sound lagging.
 pygame.mixer.init(22050, -16, 2, 1024)
-
 
 def add_to_workbench(game_state, item_file):
     #Adds items to the workbench, ready to be passed to the splicer through game state, 
