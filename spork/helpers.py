@@ -3,7 +3,7 @@ import pygame
 """This module contains utility functions used throughout the game.
 """
 
-from sprites.base_sprites import ButtonSprite
+#from sprites.base_sprites import ButtonSprite
 
 def quit_game(game_state):
     """Stops the current screen and sets the quit flag so the main loop
@@ -30,16 +30,6 @@ def top_draggable_sprite_at_point(sprites, pos):
     """
     for sprite in reversed(sprites.sprites()):
         if sprite.is_draggable and sprite.rect.collidepoint(pos):
-            return sprite
-
-def button_at_point(sprites, pos):
-    """Returns a sprite from the sprite group containing the mouse
-    position which is of type ButtonSprite.
-
-    Buttons won't overlap so we don't need to reverse the group.
-    """
-    for sprite in sprites.sprites():
-        if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
             return sprite
 
 def aspect_scale(img, target):

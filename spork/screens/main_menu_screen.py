@@ -3,8 +3,9 @@ import pygame, os, random
 # Import helper functions.
 from helpers import *
 
+
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point
 
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()

@@ -3,6 +3,16 @@ import pygame, os
 # Import helper functions.
 from helpers import *
 
+def button_at_point(sprites, pos):
+    """Returns a sprite from the sprite group containing the mouse
+    position which is of type ButtonSprite.
+
+    Buttons won't overlap so we don't need to reverse the group.
+    """
+    for sprite in sprites.sprites():
+        if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
+            return sprite
+
 class BaseSprite(pygame.sprite.Sprite):
     """The base sprite class contains useful common functionality.
     """
@@ -57,6 +67,14 @@ class ImageSprite(BaseSprite):
         # background.
         self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
         self.image.blit(loaded_img, (0, 0))
+        self.origimage = self.image
+        self.rotation = 0
+        # self.center_point = self.rect.center()
+        self.orig_width = size[0]
+        self.orig_height = size[1]
+        self.aspect_scale= self.orig_width / self.orig_height
+        self.scale = 100
+        self.cropping = False # object cannot initially be deleted
 
     def move(self, move):
         """Apply a translation the the position of this sprite's
@@ -67,13 +85,62 @@ class ImageSprite(BaseSprite):
         self.rect.x += move[0]
         self.rect.y += move[1]
 
-    def rotate90(self):
-        self.image = pygame.transform.rotate(self.image,45)
+    def rotate45(self):
+        self.rotation = self.rotation + 90
+        #self.update_sprite()
+
+        orig_rect = self.image.get_rect()
+
+        print(orig_rect.center)
+        print(pygame.mouse.get_pos())
+
+        self.image = pygame.transform.rotate(self.origimage, self.rotation)
+        self.rect = self.image.get_rect(center = (orig_rect.center[1],orig_rect.center[0]))
+        # self.rect = orig_rect.copy()
+        # self.center = self.image.get_rect().center
+        # self.image = self.image.subsurface(self.rect).copy
+
+        # orig_rect = image.get_rect()
+        # rot_image = pygame.transform.rotate(image, angle)
+        # rot_rect = orig_rect.copy()
+        # rot_rect.center = rot_image.get_rect().center
+        # rot_image = rot_image.subsurface(rot_rect).copy
+
+
+    def scale_down(self):
+        if self.scale - 2 > 0:
+            self.scale = self.scale - 2
+
+        self.update_sprite()
+
+    def scale_up(self):
+        self.scale += 2
+
+        self.update_sprite()
+
+    def update_sprite(self):
+
+        new_width = int((self.orig_width*self.scale) /100)
+        new_height =int((self.orig_height*self.scale)/100)
+
+
+        loc = self.image.get_rect().center
+        
+
+        tempimage = pygame.transform.rotate(self.origimage, self.rotation)
+        tempimage.get_rect().center = loc
+        self.image = aspect_scale( tempimage, (new_width, new_height))
+        self.image.get_rect().center = loc
         self.rect = self.image.get_rect()
 
-    def scale(self):
-        self.image = pygame.transform.scale(self.image, (50,50))
-        self.rect = self.image.get_rect()
+    def toggle_cropping(self):
+        if self.cropping == False:
+            self.cropping = True
+            return
+        if self.cropping == True:
+            self.cropping =  False
+            return
+
 
 
 class ButtonSprite(BaseSprite):
@@ -141,13 +208,83 @@ class TextSprite(BaseSprite):
             x = 0
             y += word_height
 
-class InputBox:
+class ThumbnailSprite(ImageSprite):
+    """Make thumbnails not draggable and small.
+    """
+
+    def __init__(self, x, y, img_name, w, h):
+
+        self.w = w
+        self.h = h
+
+        super(ThumbnailSprite, self).__init__(x, y, img_name)
+
+        self.is_draggable = False
+
+
+    def init_image(self):
+        # Load the image from file and scale it to thumbnail size.
+        loaded_img = pygame.image.load(self.img_name)
+        size = loaded_img.get_size()
+
+        # Create a surface containing the image with a transparent
+        # background.
+        self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
+
+        self.image.blit(loaded_img, (0, 0))
+
+        self.image = aspect_scale(self.image, (self.w, self.h))
+
+class InputBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
 
-    def __init__(self, x, y, w, h, text =''):
+    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text =''):
         self.rect = pygame.Rect(x, y, w, h)
-        self.color = (0,0,255)
+        self.colour = (0,0,255)
+        self.highlight_colour = active_colour
         self.text = text
-        self.txt_surface = FONT.render (text, True, self.color)
+        self.font = font
+        self.txt_surface = self.font.render (self.text, True, self.colour)
         self.active = False
+        self.highlightrect = pygame.Rect(x -2, y-2, w+4, h+4)
+
+    def add_character(self, char):
+        self.text = self.text + char
+        self.txt_surface = self.font.render (self.text, True, self.colour)
+        width = max(200, self.txt_surface.get_width()+10)
+        self.rect.w = width
+        self.highlightrect.w = width +4
+
+
+    def remove_character(self):
+        if len(self.text) >= 1:
+            self.text = self.text[:-1]
+            self.txt_surface = self.font.render (self.text, True, self.colour)
+
+      
+    def draw_input_box(self, game_state):
+        game_surface = game_state.get('game_surface') 
+        game_surface.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        pygame.draw.rect(game_surface, self.colour, self.rect, 2)
+        if self.active == True:
+            pygame.draw.rect(game_surface, self.highlight_colour, self.highlightrect, 2)
+        
+
+    def toggle_active(self):
+        if self.active == False:
+            self.active = True
+            return
+        if self.active == True:
+            self.active =  False
+            return
+
+    def event_handle(self, event):
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_BACKSPACE:
+                self.remove_character()
+
+            else:
+                self.add_character(event.unicode)
+

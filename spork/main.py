@@ -6,6 +6,7 @@ from screens.result_screen import result_loop
 from screens.splicer_screen import splicer_loop
 from screens.workshop_screen import workshop_loop
 
+
 # Initialise pygame stuff.
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
@@ -31,6 +32,7 @@ game_state = {
     'screen_size': (display_width, display_height),
     'active_sprite1': None,
     'active_sprite2': None,
+    'crop_sprite': None,
     'built_sprites': built_sprites,
     'active_music': 'Komiku_Glouglou.mp3',
     'music_done': True,
