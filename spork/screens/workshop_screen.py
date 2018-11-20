@@ -30,17 +30,23 @@ pygame.init()
 pygame.mixer.quit() # Hack to stop sound lagging.
 pygame.mixer.init(22050, -16, 2, 1024)
 
+
 def add_to_workbench(game_state, item_file):
     #Adds items to the workbench, ready to be passed to the splicer through game state, 
     #also adds button to delete choice
+
+    size = game_state.get('screen_size')
+    screen_width = size[0]
+    screen_height = size[1]
+
     if not game_state.get('active_sprite1'):
         game_state.update({'active_sprite1': item_file})
-        left_sprite.add(ThumbnailSprite(300, 300, item_file, 200, 200))
+        left_sprite.add(ThumbnailSprite(screen_width*0.35, screen_height*0.55, item_file, screen_width*0.2, screen_width*0.2))
         general_sprites.add(left_remove_button)
 
     elif not game_state.get('active_sprite2'):
         game_state.update({'active_sprite2': item_file})
-        right_sprite.add(ThumbnailSprite(600, 300, item_file, 200, 200))
+        right_sprite.add(ThumbnailSprite(screen_width*0.65, screen_height*0.55, item_file, screen_width*0.2, screen_width*0.2))
         general_sprites.add(right_remove_button)
 
     else:
@@ -101,13 +107,8 @@ scrollable_sprites = pygame.sprite.Group()
 left_sprite = pygame.sprite.OrderedUpdates()
 right_sprite = pygame.sprite.OrderedUpdates()
 
-left_remove_button = ButtonSprite(300, 250, 'X', remove_workbench_item, ['left'])
-right_remove_button = ButtonSprite(600, 250, 'X', remove_workbench_item, ['right'])
-
-general_sprites.add(
-    ButtonSprite(400, 50, 'Splice!', start_splicer, []),
-    ButtonSprite(400, 100, 'QUIT', quit_game, []),
-)
+left_remove_button = ButtonSprite(350, 400, 'X', remove_workbench_item, ['left'])
+right_remove_button = ButtonSprite(700, 400, 'X', remove_workbench_item, ['right'])
 
 
 def workshop_loop(game_state):
@@ -123,8 +124,19 @@ def workshop_loop(game_state):
     screen_width = size[0]
     screen_height = size[1]
 
-    scroll_rect = pygame.Rect(0,0,200,500)
+    #scroll_rect = pygame.Rect(0,0,200,500)
     scroll_surface = pygame.surface.Surface((200, 500))
+    scroll_rect = scroll_surface.get_rect(x=50, y=50)
+
+    background_image = ImageSprite(0, 0, os.getcwd() + '/data/workshop.png')
+    general_sprites.add(background_image)
+
+
+    general_sprites.add(
+        ButtonSprite(400, 50, 'Splice!', start_splicer, []),
+        ButtonSprite(400, 100, 'QUIT', quit_game, []),
+    )
+
 
     items = os.listdir(os.getcwd() + '/data/pixel-components')
    
@@ -143,6 +155,11 @@ def workshop_loop(game_state):
             scrollable_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file]))
             y += 75
 
+    keepsakes = os.listdir(os.getcwd() + '/data/temp')
+    for keepsake in keepsakes:
+        item_file = os.getcwd() + '/data/temp/' + keepsake
+        general_sprites.add(ThumbnailSprite(800,100, os.getcwd()+'/data/frame.png', 200, 200))
+        general_sprites.add(ThumbnailSprite(815, 120, item_file, 180, 180))
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
@@ -159,7 +176,7 @@ def workshop_loop(game_state):
                     scroll_down(game_state, scroll_surface)
 
                 b = button_at_point(general_sprites, event.pos)
-                c = button_at_point(scrollable_sprites, event.pos)
+                c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
                 if b:
                     click.play()
                     game_state = b.on_click(game_state)
@@ -172,13 +189,11 @@ def workshop_loop(game_state):
         game_surface.fill((255, 0, 0))
         scroll_surface.fill((0,0,0))
 
-        #pygame.draw.rect(game_surface, (255, 0, 0), scroll_rect, 10)
-
         general_sprites.draw(game_surface)
         scrollable_sprites.draw(scroll_surface)
         left_sprite.draw(game_surface)
         right_sprite.draw(game_surface)
-        game_surface.blit(scroll_surface, (0, 0))
+        game_surface.blit(scroll_surface, (50,50))
         pygame.display.update()
 
     return game_state
