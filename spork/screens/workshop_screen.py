@@ -31,6 +31,7 @@ def add_to_workbench(game_state, item_file):
 
     else:
         print('You can only have 2 items')
+        game_state = notify(game_state, 'warn', 'You can only have 2 items')
 
     return game_state
 
@@ -94,15 +95,19 @@ right_remove_button = ButtonSprite(700, 400, 'X', remove_workbench_item, ['right
 def workshop_loop(game_state):
     """The workshop screen loop.
     """
+
     # Want to move these elsewhere/design them away.
     dragging = False
     dragged_sprite = None
 
     game_surface = game_state.get('game_surface')
+    clock = game_state.get('clock')
     click = game_state.get('click_sound')
     size = game_state.get('screen_size')
     screen_width = size[0]
     screen_height = size[1]
+
+    toast_stack = game_state.get('toast_stack')
 
     #scroll_rect = pygame.Rect(0,0,200,500)
     scroll_surface = pygame.surface.Surface((200, 500))
@@ -173,7 +178,10 @@ def workshop_loop(game_state):
         scrollable_sprites.draw(scroll_surface)
         left_sprite.draw(game_surface)
         right_sprite.draw(game_surface)
+        toast_stack.draw(game_surface)
         game_surface.blit(scroll_surface, (50,50))
         pygame.display.update()
+
+        clock.tick(60)
 
     return game_state

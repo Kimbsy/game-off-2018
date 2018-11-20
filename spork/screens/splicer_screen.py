@@ -1,4 +1,4 @@
-import pygame, os
+import pygame, os, random
 
 # Import helper functions.
 from helpers import *
@@ -35,18 +35,30 @@ def switch_to_workshop(game_state):
     game_state.update({'active_screen': 'workshop_screen'})
     game_state.update({'screen_done': True})
     return game_state
+
 def quit_game(game_state):
     game_state.update({'quit': True})
     game_state.update({'screen_done': True})
     return game_state
+
 def add_1(game_state):
     splice_sprites.add(ImageSprite(490, 363, game_state.get('active_sprite1')))
     return game_state
+
 def add_2(game_state):
     splice_sprites.add(ImageSprite(390, 363, game_state.get('active_sprite2')))
     return game_state
 
 def screenshot(game_state):
+    # Choose a sellotape sound and begin playing it.
+    sound_file = random.choice([
+        'sellotape_001.wav',
+        'sellotape_002.wav',
+        'sellotape_003.wav',
+    ])
+    sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
+    channel = pygame.mixer.Channel(0)
+    channel.play(sellotape_sound)
     new_name = game_state.get('new_sprite_name')
     print(new_name)
     display_width = game_state.get('screen_size')[0]
@@ -67,6 +79,10 @@ def screenshot(game_state):
         'components': [game_state.get('active_sprite1'), game_state.get('active_sprite2')],
         'total_cost': 4000.3,
     }})
+
+    # Wait for sellotape sound to finish.
+    while channel.get_busy():
+        pass
 
     return switch_to_screen(game_state, 'result_screen')
 
@@ -96,6 +112,8 @@ def splicer_loop(game_state):
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
     game_surface = game_state.get('game_surface')
+    click = game_state.get('click_sound')
+    clock = game_state.get('clock')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
     game_state.update({'crop_sprite' : None})
@@ -105,19 +123,15 @@ def splicer_loop(game_state):
     active_input = InputBox(0.05*display_width, 0.125*display_height, 0.2*display_width, 0.1*display_height ,pygame.font.Font(None, 50) , (0,0,255), (255,255,0))
     # make the input box
 
- 
-
     count = 0 # need to design this out. This is to do with making cropped sprites.
 
+    toast_stack = game_state.get('toast_stack')
 
     splice_sprites.empty()
-    splice_thumbnails.empty()
-
     splice_thumbnails.add(ThumbnailSprite(0.1*display_width, 0.3*display_height, active_sprite1, 0.2*display_width, 0.2*display_height))
     splice_thumbnails.add(ThumbnailSprite(0.1*display_width, 0.55*display_height, active_sprite2, 0.2*display_width, 0.2*display_height))
 
     #make the thumbnails of your activesprites
-    
 
     load_buttons(game_state)
     
@@ -206,6 +220,8 @@ def splicer_loop(game_state):
         if game_state.get('crop_sprite') != None and count ==0:
             splice_sprites.add(game_state.get('crop_sprite'))
 
+        # Update.
+        toast_stack.update()
 
         # Display.
         game_surface.fill(dark_brown)
@@ -216,6 +232,10 @@ def splicer_loop(game_state):
         draw_rects(hover_rects2, game_surface, red, 0)
         active_input.draw_input_box(game_state)
 
+        toast_stack.draw(game_surface)
+
         pygame.display.update()
+
+        clock.tick(60)
 
     return game_state

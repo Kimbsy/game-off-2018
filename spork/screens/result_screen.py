@@ -120,11 +120,13 @@ class NewspaperSprite(BaseSprite):
         # Generate a tagline.
         tagline_template = random.choice(tagline_templates)
         tagline_text = tagline_template.format(self.company, name)
-        tagline_text_box = TextSprite(self.x,
-                                      self.y,
-                                      (self.w * 0.6),
-                                      (self.h * 0.9),
-                                      tagline_text)
+        tagline_text_box = TextSprite(
+            self.x,
+            self.y,
+            (self.w * 0.6),
+            (self.h * 0.9),
+            tagline_text
+        )
         self.image.blit(
             tagline_text_box.image,
             ((self.w * 0.05), (self.h * 0.2))
@@ -185,7 +187,7 @@ class NewspaperSprite(BaseSprite):
         scaled version of the image.
         """
         if (self.current_modifier < 1.0):
-            self.current_modifier += 0.004
+            self.current_modifier += 0.015
             self.image = pygame.transform.rotozoom(
                 self.original_image,
                 self.get_current_angle(),
@@ -222,7 +224,7 @@ class MoneySprite(BaseSprite):
 
     def update(self):
         if (self.current < self.profit):
-            self.current += 0.01
+            self.current += 0.1
             self.init_image()
             self.channel.play(self.coin_sound)
         else:
@@ -235,21 +237,16 @@ def result_loop(game_state):
     """The result screen loop.
     """
 
-    # TEST DATA
-    # game_state.update({'latest_product': {
-    #     'name': 'Roto-Raker 4000',
-    #     'img' : os.getcwd() + '/data/pixel-components/pixel-pot.png',
-    #     'components': ['rake', 'lawnmower'],
-    #     'total_cost': 10.45,
-    # }})
-
     game_surface = game_state.get('game_surface')
     click = game_state.get('click_sound')
+    clock = game_state.get('clock')
     screen_size = game_state.get('screen_size')
     screen_width = screen_size[0]
     screen_height = screen_size[1]
     product = game_state.get('latest_product')
     company = game_state.get('company_name')
+
+    toast_stack = game_state.get('toast_stack')
 
     # Main group of sprites to display.
     all_sprites = pygame.sprite.OrderedUpdates()
@@ -303,9 +300,8 @@ def result_loop(game_state):
                     game_state = b.on_click(game_state)
 
         # Update.
-        for sprite in all_sprites:
-            sprite.update()
-
+        all_sprites.update()
+        toast_stack.update()
 
         if (no_money and newspaper.done):
             pygame.time.wait(400)
@@ -319,5 +315,9 @@ def result_loop(game_state):
         game_surface.fill((0, 0, 0))
         all_sprites.draw(game_surface)
         pygame.display.update()
+
+        toast_stack.draw(game_surface)
+
+        clock.tick(60)
 
     return game_state

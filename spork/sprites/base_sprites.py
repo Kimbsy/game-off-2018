@@ -176,14 +176,14 @@ class TextSprite(BaseSprite):
     """Displays text wrapping lines within the bounding rectangle.
     """
 
-    def __init__(self, x, y, w, h, text):
+    def __init__(self, x, y, w, h, text, text_color=(0, 0, 0)):
         self.w = w
         self.h = h
         self.text = text
 
         # Define button text font.
         self.font = pygame.font.SysFont(None, 25)
-        self.text_color = (0, 0, 0)
+        self.text_color = text_color
         
         # Call the parent constructor.
         super(TextSprite, self).__init__(x, y)
@@ -205,8 +205,115 @@ class TextSprite(BaseSprite):
                     y += word_height
                 self.image.blit(word_surface, (x, y))
                 x += word_width + space
+                self.max_x = x
             x = 0
             y += word_height
+
+        self.max_y = y
+        if y > word_height:
+            self.max_x = self.w
+
+class ToastSprite(BaseSprite):
+    """Displays a notification at the bottom of the screen.
+    """
+
+    def __init__(self, screen_size, index, message):
+        self.level = message.get('level')
+        self.text = message.get('text')
+        self.screen_size = screen_size
+        self.w = screen_size[0] * 0.5
+        self.h = screen_size[1] * 0.1
+        self.index = index
+        self.age = 0
+        self.done = False
+        self.to_remove = False
+        self.target_h = self.h
+
+        if self.level == 'error':
+            self.background_color = (244, 66, 66)
+            self.text_color = (0, 0, 0)
+        elif self.level == 'warn':
+            self.background_color = (244, 190, 65)
+            self.text_color = (0, 0, 0)
+        elif self.level == 'ok':
+            self.background_color = (65, 244, 110)
+            self.text_color = (0, 0, 0)
+
+        super(ToastSprite, self).__init__(
+            self.screen_size[0] * 0.25,
+            self.h * (9 - self.index)
+        )
+        self.target_y = self.rect.y
+
+    def init_image(self):
+        self.image = pygame.Surface((self.w, self.h))
+        self.image.fill(self.background_color)
+        text = TextSprite(
+            0,
+            0,
+            self.w * 0.8,
+            self.h,
+            self.text,
+            text_color=self.text_color
+        )
+        x_offset = (self.w * 0.5) - (text.max_x * 0.5)
+        y_offset = (self.h * 0.5) - (text.max_y * 0.5)
+        self.image.blit(text.image, (x_offset, y_offset))
+
+    def slide_down_by_one(self, new_index):
+        self.index = new_index
+        self.target_y += self.h
+
+    def update(self, i):
+        self.rect.x = self.screen_size[0] * 0.25
+        self.rect.y = self.h * (9 - self.index)
+
+        if not self.done:
+            self.age += 1
+        elif self.target_h > 0:
+            self.target_h = max(self.target_h - 6, 0)
+            self.image = pygame.transform.scale(
+                self.image,
+                (int(self.w), int(self.target_h))
+            )
+        else:
+            self.to_remove = True
+
+        if self.target_y > self.y:
+            self.y = max(self.y + 1, self.target_y)
+            self.rect.y = self.y
+
+class ToastStack(pygame.sprite.Group):
+    """Displays messages the bottom of the screen for a few seconds to
+    notify the player of something.
+    """
+
+    def __init__(self):
+        super(ToastStack, self).__init__()
+
+    def init_size(self, screen_size):
+        self.screen_size = screen_size
+
+    def push(self, message):
+        index = len(self.sprites())
+        self.add(ToastSprite(self.screen_size, index, message))
+
+    def pop(self, toast):
+        self.remove(toast)
+        self.slide_down()
+
+    def slide_down(self):
+        for i, toast in enumerate(self.sprites()):
+            toast.slide_down_by_one(i)
+
+    def update(self):
+        for i, toast in enumerate(self.sprites()):
+            toast.update(i)
+            if toast.to_remove:
+                self.pop(toast)
+            elif toast.age > 180:
+                toast.done = True
+
 
 class ThumbnailSprite(ImageSprite):
     """Make thumbnails not draggable and small.

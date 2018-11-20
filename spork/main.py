@@ -6,6 +6,7 @@ from screens.result_screen import result_loop
 from screens.splicer_screen import splicer_loop
 from screens.workshop_screen import workshop_loop
 
+from sprites.base_sprites import ToastStack
 
 # Initialise pygame stuff.
 pygame.mixer.pre_init(22050, -16, 2, 1024)
@@ -42,6 +43,10 @@ done = False
 
 while not done:
     active_screen = game_state.get('active_screen')
+
+    toast_stack = ToastStack()
+    toast_stack.init_size(game_state.get('screen_size'))
+    game_state.update({'toast_stack': toast_stack})
 
     if game_state.get('music_done'):
         game_state.update({'music_done': False})

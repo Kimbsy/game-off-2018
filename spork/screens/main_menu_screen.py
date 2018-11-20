@@ -1,4 +1,4 @@
-import pygame, os, random
+import pygame, os, random, string
 
 # Import helper functions.
 from helpers import *
@@ -24,13 +24,17 @@ def main_menu_loop(game_state):
     """
 
     game_surface = game_state.get('game_surface')
+    clock = game_state.get('clock')
     click = game_state.get('click_sound')
     screen_size = game_state.get('screen_size')
     screen_width = screen_size[0]
     screen_height = screen_size[1]
 
+    toast_stack = game_state.get('toast_stack')
+
     # Main group of sprites to display.
-    all_sprites = pygame.sprite.OrderedUpdates(
+    all_sprites = pygame.sprite.OrderedUpdates()
+    all_sprites.add(
         ButtonSprite(
             (screen_width * 0.5),
             (screen_height * 0.4),
@@ -44,7 +48,7 @@ def main_menu_loop(game_state):
             'Quit',
             quit_game,
             [],
-        )
+        ),
     )
 
     # Want to refactor this body into seperate functions.
@@ -62,12 +66,15 @@ def main_menu_loop(game_state):
                     game_state = b.on_click(game_state)
 
         # Update.
-        for sprite in all_sprites:
-            sprite.update()
+        all_sprites.update()
+        toast_stack.update()
 
         # Display.
         game_surface.fill((0, 0, 0))
         all_sprites.draw(game_surface)
+        toast_stack.draw(game_surface)
         pygame.display.update()
+
+        clock.tick(60)
 
     return game_state
