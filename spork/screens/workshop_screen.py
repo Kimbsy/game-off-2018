@@ -116,12 +116,10 @@ def workshop_loop(game_state):
     background_image = ImageSprite(0, 0, os.getcwd() + '/data/workshop.png')
     general_sprites.add(background_image)
 
-
     general_sprites.add(
         ButtonSprite(400, 50, 'Splice!', start_splicer, []),
         ButtonSprite(400, 100, 'QUIT', quit_game, []),
     )
-
 
     items = os.listdir(os.getcwd() + '/data/pixel-components')
    
@@ -131,9 +129,7 @@ def workshop_loop(game_state):
     general_sprites.add(ButtonSprite(200, 50, 'Up', scroll_up, [scroll_surface]))
     general_sprites.add(ButtonSprite(200, 350, 'Down', scroll_down, [scroll_surface]))
 
-
     for item in items:
-
             item_file = os.getcwd() + '/data/pixel-components/' + item
             scrollable_sprites.add(ThumbnailSprite(x, y, item_file, 50, 50))
             item_text = item[6:-4]
@@ -159,16 +155,19 @@ def workshop_loop(game_state):
                     scroll_up(game_state, scroll_surface)
                 elif scroll_rect.collidepoint(event.pos) and event.button == 5:
                     scroll_down(game_state, scroll_surface)
+                else:
+                    b = button_at_point(general_sprites, event.pos)
+                    c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
+                    if b:
+                        click.play()
+                        game_state = b.on_click(game_state)
 
-                b = button_at_point(general_sprites, event.pos)
-                c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
-                if b:
-                    click.play()
-                    game_state = b.on_click(game_state)
-                    
-                if c:
-                    click.play()
-                    game_state = c.on_click(game_state)
+                        if c:
+                            click.play()
+                            game_state = c.on_click(game_state)
+
+        # Update.
+        toast_stack.update()
                 
         # Display.
         game_surface.fill((255, 0, 0))
