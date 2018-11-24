@@ -224,7 +224,10 @@ class MoneySprite(BaseSprite):
 
     def update(self):
         if (self.current < self.profit):
-            self.current += 0.1
+            if (self.current + 0.1 > self.profit):
+                self.current = self.profit
+            else:
+                self.current += 0.1
             self.init_image()
             self.channel.play(self.coin_sound)
         else:
