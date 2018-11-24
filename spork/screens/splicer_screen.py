@@ -135,6 +135,7 @@ def splicer_loop(game_state):
     toast_stack = game_state.get('toast_stack')
 
     splice_sprites.empty()
+    splice_thumbnails.empty()
     splice_thumbnails.add(ThumbnailSprite(0.1*display_width, 0.3*display_height, active_sprite1, 0.2*display_width, 0.2*display_height))
     splice_thumbnails.add(ThumbnailSprite(0.1*display_width, 0.55*display_height, active_sprite2, 0.2*display_width, 0.2*display_height))
 
