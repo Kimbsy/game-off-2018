@@ -59,7 +59,6 @@ def screenshot(game_state):
     sound_file = random.choice([
         'sellotape_001.wav',
         'sellotape_002.wav',
-        'sellotape_003.wav',
     ])
     sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
     channel = pygame.mixer.Channel(0)
