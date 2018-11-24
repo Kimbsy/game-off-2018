@@ -154,18 +154,14 @@ def workshop_loop(game_state):
     count = 1
 
     keepsakes = os.listdir(os.getcwd() + '/data/temp')
-    print(keepsakes)
     for keepsake in keepsakes:
-        print(keepsake)
         item_file = os.getcwd() + '/data/temp/' + keepsake
         if count<=5:
-            print("gets here")
             general_sprites.add(ThumbnailSprite(frame_x1,frame_y, os.getcwd()+'/data/frame.png', 100, 100))
             general_sprites.add(ThumbnailSprite(frame_x1+15, frame_y+20, item_file, 80, 80))
             frame_x1 += 150
             count += 1
         else:
-            print("then gets here")
             general_sprites.add(ThumbnailSprite(frame_x2,frame_y + 120, os.getcwd()+'/data/frame.png', 100, 100))
             general_sprites.add(ThumbnailSprite(frame_x2+15, frame_y+140, item_file, 80, 80))
             frame_x2 += 150
@@ -183,19 +179,20 @@ def workshop_loop(game_state):
                     scroll_up(game_state, scroll_surface)
                 elif scroll_rect.collidepoint(event.pos) and event.button == 5:
                     scroll_down(game_state, scroll_surface)
+                elif (event.button == 1):
+                    b = button_at_point(general_sprites, event.pos)
+                    c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
+                    if b:
+                        click.play()
+                        game_state = b.on_click(game_state)
 
-                b = button_at_point(general_sprites, event.pos)
-                c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
-                if b:
-                    click.play()
-                    game_state = b.on_click(game_state)
-                    
-                if c and scroll_rect.collidepoint(event.pos):
-                    click.play()
-                    game_state = c.on_click(game_state)
-        
+                    if c and scroll_rect.collidepoint(event.pos):
+                        click.play()
+                        game_state = c.on_click(game_state)
+
+        # Update.
         toast_stack.update()
-
+                
         # Display.
         game_surface.fill((255, 0, 0))
         scroll_surface.fill((0,0,0))

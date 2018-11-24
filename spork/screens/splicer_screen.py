@@ -21,14 +21,14 @@ def load_buttons(game_state):
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
     splice_sprites.add(
-    ButtonSprite(0.05*x, 0.25*y, "add 1", add_1, []),
-    ButtonSprite(0.15*x, 0.25*y, "crop 1", crop, ["1"]),
-    ButtonSprite(0.05*x, 0.5*y, "add 2", add_2, []),
-    ButtonSprite(0.15*x, 0.5*y, "crop 2", crop, ["2"]),
-    ButtonSprite(0.1*x, 0.8*y, "SPLICE", screenshot, []),
-    ButtonSprite(0.1*x, 0.85*y, 'Workshop!', switch_to_workshop, []),
-    ButtonSprite(0.1*x, 0.9*y, 'QUIT', quit_game, []
-    ))
+        ButtonSprite(0.05*x, 0.25*y, "add 1", add_1, []),
+        ButtonSprite(0.15*x, 0.25*y, "crop 1", crop, ["1"]),
+        ButtonSprite(0.05*x, 0.5*y, "add 2", add_2, []),
+        ButtonSprite(0.15*x, 0.5*y, "crop 2", crop, ["2"]),
+        ButtonSprite(0.1*x, 0.8*y, "SPLICE", screenshot, []),
+        ButtonSprite(0.1*x, 0.85*y, 'Workshop!', switch_to_workshop, []),
+        ButtonSprite(0.1*x, 0.9*y, 'QUIT', quit_game, []),
+    )
     return game_state
 
 def switch_to_workshop(game_state):
@@ -50,6 +50,11 @@ def add_2(game_state):
     return game_state
 
 def screenshot(game_state):
+    new_name = game_state.get('new_sprite_name')
+    if not new_name:
+        return notify(game_state, 'warn', 'Your sprite must have a name.')
+    print(new_name)
+
     # Choose a sellotape sound and begin playing it.
     sound_file = random.choice([
         'sellotape_001.wav',
@@ -59,17 +64,20 @@ def screenshot(game_state):
     sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
     channel = pygame.mixer.Channel(0)
     channel.play(sellotape_sound)
-    new_name = game_state.get('new_sprite_name')
-    print(new_name)
+    
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
     rect = pygame.Rect(10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28)
-    sub = game_state.get('game_surface').subsurface(rect)
+
+    transparent_surface = pygame.Surface((display_width, display_height), pygame.SRCALPHA, 32)
+    splice_sprites.draw(transparent_surface)
+    sub = transparent_surface.subsurface(rect)
+
     pygame.image.save(sub, os.getcwd() + "/data/temp/" + new_name + ".png")
-    x= game_state.get('built_sprites')
+    x = game_state.get('built_sprites')
     x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png"))
     game_state.update({'built_sprites' : x})
-    
+
     for i in game_state.get('built_sprites'):
         print(i.img_name)
 
@@ -120,7 +128,7 @@ def splicer_loop(game_state):
     hover_rects1= []
     hover_rects2 = []
     
-    active_input = InputBox(0.05*display_width, 0.125*display_height, 0.2*display_width, 0.1*display_height ,pygame.font.Font(None, 50) , (0,0,255), (255,255,0))
+    active_input = InputBox(0.05*display_width, 0.125*display_height, 200, 0.1*display_height ,pygame.font.Font(None, 50) , (0,0,255), (255,255,0))
     # make the input box
 
     count = 0 # need to design this out. This is to do with making cropped sprites.

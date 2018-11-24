@@ -13,6 +13,7 @@ def button_at_point(sprites, pos):
         if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
             return sprite
 
+
 class BaseSprite(pygame.sprite.Sprite):
     """The base sprite class contains useful common functionality.
     """
@@ -41,8 +42,9 @@ class BaseSprite(pygame.sprite.Sprite):
         """
         raise NotImplementedError('Please implement an init_image method')
 
+
 class ImageSprite(BaseSprite):
-    """Sprite which loads an image from ../data/ directory.
+    """Sprite which loads an image.
 
     Currently this will load the image each time a sprite is made,
     should cache images somewhere in future.
@@ -106,7 +108,6 @@ class ImageSprite(BaseSprite):
         # rot_rect.center = rot_image.get_rect().center
         # rot_image = rot_image.subsurface(rot_rect).copy
 
-
     def scale_down(self):
         if self.scale - 2 > 0:
             self.scale = self.scale - 2
@@ -123,9 +124,7 @@ class ImageSprite(BaseSprite):
         new_width = int((self.orig_width*self.scale) /100)
         new_height =int((self.orig_height*self.scale)/100)
 
-
         loc = self.image.get_rect().center
-        
 
         tempimage = pygame.transform.rotate(self.origimage, self.rotation)
         tempimage.get_rect().center = loc
@@ -142,7 +141,6 @@ class ImageSprite(BaseSprite):
             return
 
 
-
 class ButtonSprite(BaseSprite):
     """Sprite which displays as a clickable button with text.
     """
@@ -150,6 +148,8 @@ class ButtonSprite(BaseSprite):
     def __init__(self, x, y, text, f, args, w = 100, h = 20):
         # Need to specify properties before init_img is called.
         self.text = text
+        self.w = 100
+        self.h = 20
         self.f = f
         self.args = args
         self.w = w
@@ -168,12 +168,16 @@ class ButtonSprite(BaseSprite):
         self.image.fill((100, 100, 100))
         
         rendered_text = self.font.render(self.text, True, self.text_color)
-        self.image.blit(rendered_text, (15, 0))
+        text_width, text_height = rendered_text.get_size()
+        x_offset = (self.w / 2) - (text_width / 2)
+        y_offset = (self.h / 2) - (text_height / 2)
+        self.image.blit(rendered_text, (x_offset, y_offset))
 
     def on_click(self, game_state):
         """Invoke the on_click function.
         """
         return self.f(game_state, *self.args)
+
 
 class TextSprite(BaseSprite):
     """Displays text wrapping lines within the bounding rectangle.
@@ -215,6 +219,7 @@ class TextSprite(BaseSprite):
         self.max_y = y
         if y > word_height:
             self.max_x = self.w
+
 
 class ToastSprite(BaseSprite):
     """Displays a notification at the bottom of the screen.
@@ -286,6 +291,7 @@ class ToastSprite(BaseSprite):
             self.y = max(self.y + 1, self.target_y)
             self.rect.y = self.y
 
+
 class ToastStack(pygame.sprite.Group):
     """Displays messages the bottom of the screen for a few seconds to
     notify the player of something.
@@ -345,12 +351,14 @@ class ThumbnailSprite(ImageSprite):
 
         self.image = aspect_scale(self.image, (self.w, self.h))
 
+
 class InputBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
 
-    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text =''):
+    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text ='', center_x=None):
         self.rect = pygame.Rect(x, y, w, h)
+        self.center_x = center_x
         self.colour = (0,0,255)
         self.highlight_colour = active_colour
         self.text = text
@@ -359,18 +367,31 @@ class InputBox(object):
         self.active = False
         self.highlightrect = pygame.Rect(x -2, y-2, w+4, h+4)
 
-    def add_character(self, char):
-        self.text = self.text + char
-        self.txt_surface = self.font.render (self.text, True, self.colour)
+    def adjust(self):
         width = max(200, self.txt_surface.get_width()+10)
         self.rect.w = width
-        self.highlightrect.w = width +4
+        self.highlightrect.w = width+4
 
+        if self.center_x:
+            self.rect.x = self.center_x - (0.5*self.rect.w)
+
+        self.highlightrect = pygame.Rect(
+            self.rect.x -2,
+            self.rect.y-2,
+            self.rect.w+4,
+            self.rect.h+4
+        )
+
+    def add_character(self, char):
+        self.text = self.text + char
+        self.txt_surface = self.font.render(self.text, True, self.colour)
+        self.adjust() 
 
     def remove_character(self):
         if len(self.text) >= 1:
             self.text = self.text[:-1]
             self.txt_surface = self.font.render (self.text, True, self.colour)
+        self.adjust()    
 
       
     def draw_input_box(self, game_state):
@@ -397,4 +418,3 @@ class InputBox(object):
 
             else:
                 self.add_character(event.unicode)
-
