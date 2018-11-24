@@ -169,6 +169,9 @@ def workshop_loop(game_state):
                 if c:
                     click.play()
                     game_state = c.on_click(game_state)
+
+        # Update.
+        toast_stack.update()
                 
         # Display.
         game_surface.fill((255, 0, 0))
