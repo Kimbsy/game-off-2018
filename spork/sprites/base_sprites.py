@@ -44,7 +44,7 @@ class BaseSprite(pygame.sprite.Sprite):
 
 
 class ImageSprite(BaseSprite):
-    """Sprite which loads an image from ../data/ directory.
+    """Sprite which loads an image.
 
     Currently this will load the image each time a sprite is made,
     should cache images somewhere in future.
@@ -353,8 +353,9 @@ class InputBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
 
-    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text =''):
+    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text ='', center_x=None):
         self.rect = pygame.Rect(x, y, w, h)
+        self.center_x = center_x
         self.colour = (0,0,255)
         self.highlight_colour = active_colour
         self.text = text
@@ -363,18 +364,31 @@ class InputBox(object):
         self.active = False
         self.highlightrect = pygame.Rect(x -2, y-2, w+4, h+4)
 
-    def add_character(self, char):
-        self.text = self.text + char
-        self.txt_surface = self.font.render (self.text, True, self.colour)
+    def adjust(self):
         width = max(200, self.txt_surface.get_width()+10)
         self.rect.w = width
-        self.highlightrect.w = width +4
+        self.highlightrect.w = width+4
 
+        if self.center_x:
+            self.rect.x = self.center_x - (0.5*self.rect.w)
+
+        self.highlightrect = pygame.Rect(
+            self.rect.x -2,
+            self.rect.y-2,
+            self.rect.w+4,
+            self.rect.h+4
+        )
+
+    def add_character(self, char):
+        self.text = self.text + char
+        self.txt_surface = self.font.render(self.text, True, self.colour)
+        self.adjust() 
 
     def remove_character(self):
         if len(self.text) >= 1:
             self.text = self.text[:-1]
             self.txt_surface = self.font.render (self.text, True, self.colour)
+        self.adjust()    
 
       
     def draw_input_box(self, game_state):

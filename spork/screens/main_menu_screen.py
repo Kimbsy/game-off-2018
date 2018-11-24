@@ -5,7 +5,7 @@ from helpers import *
 
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point
+from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point
 
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
@@ -32,18 +32,34 @@ def main_menu_loop(game_state):
 
     toast_stack = game_state.get('toast_stack')
 
+    company_name = game_state.get('company_name')
+    input_font = pygame.font.Font(None, 50)
+    input_width, input_height = input_font.render(company_name, True, (0, 0, 0)).get_size()
+
+    company_name_input = InputBox(
+        (0.5*screen_width) - (0.5*input_width),
+        0.125*screen_height,
+        input_width + 10,
+        input_height + 10,
+        input_font,
+        (0, 0, 255),
+        (255, 255, 0),
+        text=company_name,
+        center_x=0.5*screen_width
+    )
+
     # Main group of sprites to display.
     all_sprites = pygame.sprite.OrderedUpdates()
     all_sprites.add(
         ButtonSprite(
-            (screen_width * 0.5),
+            (screen_width * 0.46),
             (screen_height * 0.4),
             'Play!',
             start_game,
             [],
         ),
         ButtonSprite(
-            (screen_width * 0.5),
+            (screen_width * 0.46),
             (screen_height * 0.5),
             'Quit',
             quit_game,
@@ -59,11 +75,17 @@ def main_menu_loop(game_state):
             if event.type == pygame.QUIT:
                 quit_game(game_state)
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:                
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1 and company_name_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
+                        company_name_input.toggle_active()
                 b = button_at_point(all_sprites, event.pos)
                 if b:
+                    game_state.update({'company_name': company_name_input.text}) # TODO: this is a little hacky.
                     click.play()
                     game_state = b.on_click(game_state)
+
+            if company_name_input.active == True:      
+                company_name_input.event_handle(event) #Input Box Class has inbuilt event handling function for key down events.
 
         # Update.
         all_sprites.update()
@@ -72,6 +94,7 @@ def main_menu_loop(game_state):
         # Display.
         game_surface.fill((0, 0, 0))
         all_sprites.draw(game_surface)
+        company_name_input.draw_input_box(game_state)
         toast_stack.draw(game_surface)
         pygame.display.update()
 
