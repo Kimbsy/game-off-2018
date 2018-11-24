@@ -59,7 +59,6 @@ def screenshot(game_state):
     sound_file = random.choice([
         'sellotape_001.wav',
         'sellotape_002.wav',
-        'sellotape_003.wav',
     ])
     sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
     channel = pygame.mixer.Channel(0)
@@ -128,7 +127,7 @@ def splicer_loop(game_state):
     hover_rects1= []
     hover_rects2 = []
     
-    active_input = InputBox(0.05*display_width, 0.125*display_height, 0.2*display_width, 0.1*display_height ,pygame.font.Font(None, 50) , (0,0,255), (255,255,0))
+    active_input = InputBox(0.05*display_width, 0.125*display_height, 200, 0.1*display_height ,pygame.font.Font(None, 50) , (0,0,255), (255,255,0))
     # make the input box
 
     count = 0 # need to design this out. This is to do with making cropped sprites.
