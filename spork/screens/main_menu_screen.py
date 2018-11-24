@@ -31,20 +31,24 @@ def main_menu_loop(game_state):
     screen_height = screen_size[1]
 
     toast_stack = game_state.get('toast_stack')
+    logo_sprites = pygame.sprite.OrderedUpdates()
+    logo_sprites.add(
+    	ImageSprite(screen_width*0.31, screen_height*0.2, os.getcwd() +"/data/imgbase/sporklogo1.png"  )
+    	)
 
     # Main group of sprites to display.
     all_sprites = pygame.sprite.OrderedUpdates()
     all_sprites.add(
         ButtonSprite(
-            (screen_width * 0.5),
-            (screen_height * 0.4),
+            (screen_width * 0.455),
+            (screen_height * 0.8),
             'Play!',
             start_game,
             [],
         ),
         ButtonSprite(
-            (screen_width * 0.5),
-            (screen_height * 0.5),
+            (screen_width * 0.455),
+            (screen_height * 0.9),
             'Quit',
             quit_game,
             [],
@@ -72,6 +76,7 @@ def main_menu_loop(game_state):
         # Display.
         game_surface.fill((0, 0, 0))
         all_sprites.draw(game_surface)
+        logo_sprites.draw(game_surface)
         toast_stack.draw(game_surface)
         pygame.display.update()
 
