@@ -151,13 +151,11 @@ def workshop_loop(game_state):
                 quit_game(game_state)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(event.button)
                 if scroll_rect.collidepoint(event.pos) and event.button == 4:
                     scroll_up(game_state, scroll_surface)
                 elif scroll_rect.collidepoint(event.pos) and event.button == 5:
                     scroll_down(game_state, scroll_surface)
                 elif (event.button == 1):
-                    print('foo')
                     b = button_at_point(general_sprites, event.pos)
                     c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
                     if b:
