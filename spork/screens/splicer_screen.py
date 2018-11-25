@@ -53,7 +53,6 @@ def screenshot(game_state, splice_canvas):
     new_name = game_state.get('new_sprite_name')
     if not new_name:
         return notify(game_state, 'warn', 'Your sprite must have a name.')
-    print(new_name)
 
     # Choose a sellotape sound and begin playing it.
     sound_file = random.choice([
@@ -66,7 +65,6 @@ def screenshot(game_state, splice_canvas):
     
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
-    #rect = pygame.Rect(10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28)
     rect = splice_canvas
 
     transparent_surface = pygame.Surface((display_width, display_height), pygame.SRCALPHA, 32)
@@ -77,9 +75,6 @@ def screenshot(game_state, splice_canvas):
     x = game_state.get('built_sprites')
     x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png"))
     game_state.update({'built_sprites' : x})
-
-    for i in game_state.get('built_sprites'):
-        print(i.img_name)
 
     game_state.update({'latest_product': {
         'name': new_name,
@@ -151,8 +146,6 @@ def splicer_loop(game_state):
 
     toast_stack = game_state.get('toast_stack')
 
-
-    # - (thumbnail_size[0]/2)
     splice_sprites.empty()
     splice_thumbnails.empty()
     splice_thumbnails.add(ThumbnailSprite(0.175*display_width - (thumbnail_size[0]/4), 0.3*display_height, active_sprite1, thumbnail_size[0], thumbnail_size[1] ))
@@ -184,7 +177,6 @@ def splicer_loop(game_state):
             else:
                 hover_rects2 = []
 
-
         else:
             hover_rects1 = []
             hover_rects2 = []
@@ -206,12 +198,10 @@ def splicer_loop(game_state):
                             splice_sprites.add(s)
                     if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
                         active_input.toggle_active()
-                        
 
                 if event.button == 3:
                     if s:
                         s.rotate_clockwise() # actually rotates 45 right now.
-                
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
@@ -240,14 +230,12 @@ def splicer_loop(game_state):
                         if event.key == pygame.K_RIGHT:
                             s.rotate_clockwise()
 
-
         keys = pygame.key.get_pressed()
         if s:
             if keys[pygame.K_UP]:
                 s.scale_up()
             if keys[pygame.K_DOWN]:
                 s.scale_down()
-
 
         if game_state.get('crop_sprite') != None and count ==0:
             splice_sprites.add(game_state.get('crop_sprite'))
@@ -263,7 +251,6 @@ def splicer_loop(game_state):
         draw_rects(hover_rects1, game_surface, black, 2)
         draw_rects(hover_rects2, game_surface, red, 0)
         active_input.draw_input_box(game_state)
-        pygame.draw.line(game_surface, black, (0.175*display_width, 0.02*display_height), (0.175*display_width, 0.98*display_height))
 
         toast_stack.draw(game_surface)
 

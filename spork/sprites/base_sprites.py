@@ -88,38 +88,6 @@ class ImageSprite(BaseSprite):
         self.rect.x += move[0]
         self.rect.y += move[1]
 
-    # def rotate45(self):
-    #     self.rotation = self.rotation + 90
-    #     #self.update_sprite()
-
-    #     orig_rect = self.image.get_rect()
-
-    #     print(orig_rect.center)
-    #     print(pygame.mouse.get_pos())
-
-    #     self.image = pygame.transform.rotate(self.origimage, self.rotation)
-    #     self.rect = self.image.get_rect(center = (orig_rect.center[1],orig_rect.center[0]))
-    #     # self.rect = orig_rect.copy()
-    #     # self.center = self.image.get_rect().center
-    #     # self.image = self.image.subsurface(self.rect).copy
-
-    #     # orig_rect = image.get_rect()
-    #     # rot_image = pygame.transform.rotate(image, angle)
-    #     # rot_rect = orig_rect.copy()
-    #     # rot_rect.center = rot_image.get_rect().center
-    #     # rot_image = rot_image.subsurface(rot_rect).copy
-
-    # def rotate_new(self):
-    #     self.rotation =self.rotation +45
-    #     orig_rect = self.image.get_rect()
-    #     size = (self.orig_width, self.orig_height)
-
-    #     src_im = Image.open(self.img_name)
-    #     rot =src_im.rotate(self.rotation ,expand =1).resize(size)
-    #     rot.save("rot.png")
-    #     self.image = pygame.image.load("rot.png")
-    #     self.rect = self.image.get_rect()
-
     def rotate_clockwise(self):
         self.rotation =self.rotation -30
 
@@ -151,21 +119,13 @@ class ImageSprite(BaseSprite):
         scaled_width = (self.orig_width*self.scale)/100
         scaled_height = (self.orig_height*self.scale)/100
         
-        # new_width = abs(scaled_width*math.sin(rotrads)) + abs(scaled_height*math.cos(rotrads))
-
-        # new_height = abs(scaled_height*math.sin(rotrads)) + abs(scaled_width*math.cos(rotrads))
-
         new_width = abs(scaled_height*math.sin(rotrads)) + abs(scaled_width*math.cos(rotrads))
 
         new_height = abs(scaled_width*math.sin(rotrads)) + abs(scaled_height*math.cos(rotrads))
 
-        #print(self.orig_width, self.orig_height)
-        print(new_width, new_height)
-
         loc = self.rect.center
 
         tempimage = pygame.transform.rotate(self.origimage, self.rotation)
-        #tempimage.get_rect().center = loc
         self.image = aspect_scale( tempimage, (new_width, new_height))
         self.rect = self.image.get_rect()
         self.rect.center= loc
@@ -470,8 +430,6 @@ class InputBox(object):
             return
 
     def event_handle(self, event):
-
-        # if event.type == pygame.KEYDOWN:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_BACKSPACE]:
             self.remove_character()
