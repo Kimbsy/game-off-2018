@@ -59,7 +59,7 @@ def screenshot(game_state):
     sound_file = random.choice([
         'sellotape_001.wav',
         'sellotape_002.wav',
-        'sellotape_003.wav',
+        #'sellotape_003.wav',
     ])
     sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
     channel = pygame.mixer.Channel(0)
@@ -75,7 +75,7 @@ def screenshot(game_state):
 
     pygame.image.save(sub, os.getcwd() + "/data/temp/" + new_name + ".png")
     x = game_state.get('built_sprites')
-    x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png"))
+    x.add(ThumbnailSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png", 100, 100))
     game_state.update({'built_sprites' : x})
 
     for i in game_state.get('built_sprites'):

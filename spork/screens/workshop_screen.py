@@ -36,7 +36,7 @@ def add_to_workbench(game_state, item_file):
     return game_state
 
 def remove_workbench_item(game_state, side):
-    #empty the gamestate of options to splice and remove images
+    #empty the game_state of options to splice and remove images
     if side == 'left':
         game_state.update({'active_sprite1': None})
         left_sprite.empty()
@@ -82,6 +82,9 @@ def scroll_down(game_state, surface):
 
     return game_state
 
+def end_game(game_state):
+    return switch_to_screen(game_state, 'game_end_screen')
+
 
 # Main group of sprites to display.
 general_sprites = pygame.sprite.OrderedUpdates()
@@ -96,6 +99,10 @@ right_remove_button = ButtonSprite(700, 400, 'X', remove_workbench_item, ['right
 def workshop_loop(game_state):
     """The workshop screen loop.
     """
+    built_sprites = game_state.get('built_sprites')
+    if len(built_sprites) > 9:
+        game_state = end_game(game_state)
+        return game_state
 
     #remove all sprites from previous time screen was open
     general_sprites.empty()
@@ -148,23 +155,21 @@ def workshop_loop(game_state):
             scrollable_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file], w = 150))
             y += 75
 
-    frame_x1 = screen_width*0.3
-    frame_x2 = screen_width*0.3
+    frame_x = screen_width*0.3
     frame_y = screen_height*0.2
-    count = 1
+    count = 0
 
-    keepsakes = os.listdir(os.getcwd() + '/data/temp')
-    for keepsake in keepsakes:
-        item_file = os.getcwd() + '/data/temp/' + keepsake
-        if count<=5:
-            general_sprites.add(ThumbnailSprite(frame_x1,frame_y, os.getcwd()+'/data/frame.png', 100, 100))
-            general_sprites.add(ThumbnailSprite(frame_x1+15, frame_y+20, item_file, 80, 80))
-            frame_x1 += 150
-            count += 1
-        else:
-            general_sprites.add(ThumbnailSprite(frame_x2,frame_y + 120, os.getcwd()+'/data/frame.png', 100, 100))
-            general_sprites.add(ThumbnailSprite(frame_x2+15, frame_y+140, item_file, 80, 80))
-            frame_x2 += 150
+    for keepsake in built_sprites:
+        if count == 5:
+            frame_y += 150
+            frame_x = screen_width*0.3
+        keepsake.rect.x = frame_x
+        keepsake.rect.y = frame_y
+        general_sprites.add(keepsake)
+        frame_x += 150
+        count += 1
+
+
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):

@@ -5,6 +5,7 @@ from screens.main_menu_screen import main_menu_loop
 from screens.result_screen import result_loop
 from screens.splicer_screen import splicer_loop
 from screens.workshop_screen import workshop_loop
+from screens.game_end_screen import game_end_loop
 
 from sprites.base_sprites import ToastStack
 
@@ -76,6 +77,10 @@ while not done:
     elif active_screen == 'result_screen':
         game_state.update({'screen_done': False})
         game_state = result_loop(game_state)
+
+    elif active_screen == 'game_end_screen':
+        game_state.update({'screen_done': False})
+        game_state = game_end_loop(game_state)
 
 pygame.quit()
 quit()
