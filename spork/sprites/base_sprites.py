@@ -1,4 +1,5 @@
 import pygame, os
+import math
 
 # Import helper functions.
 from helpers import *
@@ -76,7 +77,7 @@ class ImageSprite(BaseSprite):
         self.orig_height = size[1]
         self.aspect_scale= self.orig_width / self.orig_height
         self.scale = 100
-        self.cropping = False # object cannot initially be deleted
+        self.deletable = False # object cannot initially be deleted
 
     def move(self, move):
         """Apply a translation the the position of this sprite's
@@ -87,26 +88,51 @@ class ImageSprite(BaseSprite):
         self.rect.x += move[0]
         self.rect.y += move[1]
 
-    def rotate45(self):
-        self.rotation = self.rotation + 90
-        #self.update_sprite()
+    # def rotate45(self):
+    #     self.rotation = self.rotation + 90
+    #     #self.update_sprite()
 
-        orig_rect = self.image.get_rect()
+    #     orig_rect = self.image.get_rect()
 
-        print(orig_rect.center)
-        print(pygame.mouse.get_pos())
+    #     print(orig_rect.center)
+    #     print(pygame.mouse.get_pos())
 
-        self.image = pygame.transform.rotate(self.origimage, self.rotation)
-        self.rect = self.image.get_rect(center = (orig_rect.center[1],orig_rect.center[0]))
-        # self.rect = orig_rect.copy()
-        # self.center = self.image.get_rect().center
-        # self.image = self.image.subsurface(self.rect).copy
+    #     self.image = pygame.transform.rotate(self.origimage, self.rotation)
+    #     self.rect = self.image.get_rect(center = (orig_rect.center[1],orig_rect.center[0]))
+    #     # self.rect = orig_rect.copy()
+    #     # self.center = self.image.get_rect().center
+    #     # self.image = self.image.subsurface(self.rect).copy
 
-        # orig_rect = image.get_rect()
-        # rot_image = pygame.transform.rotate(image, angle)
-        # rot_rect = orig_rect.copy()
-        # rot_rect.center = rot_image.get_rect().center
-        # rot_image = rot_image.subsurface(rot_rect).copy
+    #     # orig_rect = image.get_rect()
+    #     # rot_image = pygame.transform.rotate(image, angle)
+    #     # rot_rect = orig_rect.copy()
+    #     # rot_rect.center = rot_image.get_rect().center
+    #     # rot_image = rot_image.subsurface(rot_rect).copy
+
+    # def rotate_new(self):
+    #     self.rotation =self.rotation +45
+    #     orig_rect = self.image.get_rect()
+    #     size = (self.orig_width, self.orig_height)
+
+    #     src_im = Image.open(self.img_name)
+    #     rot =src_im.rotate(self.rotation ,expand =1).resize(size)
+    #     rot.save("rot.png")
+    #     self.image = pygame.image.load("rot.png")
+    #     self.rect = self.image.get_rect()
+
+    def rotate_clockwise(self):
+        self.rotation =self.rotation -30
+
+        if self.rotation == 360:
+            self.rotation = 0
+        self.update_sprite()
+
+    def rotate_counterclockwise(self):
+        self.rotation =self.rotation + 30
+
+        if self.rotation == 360:
+            self.rotation = 0
+        self.update_sprite()
 
     def scale_down(self):
         if self.scale - 2 > 0:
@@ -121,23 +147,35 @@ class ImageSprite(BaseSprite):
 
     def update_sprite(self):
 
-        new_width = int((self.orig_width*self.scale) /100)
-        new_height =int((self.orig_height*self.scale)/100)
+        rotrads = (self.rotation*2*math.pi)/360
+        scaled_width = (self.orig_width*self.scale)/100
+        scaled_height = (self.orig_height*self.scale)/100
+        
+        # new_width = abs(scaled_width*math.sin(rotrads)) + abs(scaled_height*math.cos(rotrads))
 
-        loc = self.image.get_rect().center
+        # new_height = abs(scaled_height*math.sin(rotrads)) + abs(scaled_width*math.cos(rotrads))
+
+        new_width = abs(scaled_height*math.sin(rotrads)) + abs(scaled_width*math.cos(rotrads))
+
+        new_height = abs(scaled_width*math.sin(rotrads)) + abs(scaled_height*math.cos(rotrads))
+
+        #print(self.orig_width, self.orig_height)
+        print(new_width, new_height)
+
+        loc = self.rect.center
 
         tempimage = pygame.transform.rotate(self.origimage, self.rotation)
-        tempimage.get_rect().center = loc
+        #tempimage.get_rect().center = loc
         self.image = aspect_scale( tempimage, (new_width, new_height))
-        self.image.get_rect().center = loc
         self.rect = self.image.get_rect()
+        self.rect.center= loc
 
-    def toggle_cropping(self):
-        if self.cropping == False:
-            self.cropping = True
+    def toggle_deletable(self):
+        if self.deletable == False:
+            self.deletable = True
             return
-        if self.cropping == True:
-            self.cropping =  False
+        if self.deletable == True:
+            self.deletable =  False
             return
 
 
@@ -356,7 +394,10 @@ class InputBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
 
-    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text ='', center_x=None, min_width = 100):
+    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, center_x, text ='', min_width = 300, max_width =550):
+        if w < min_width:
+            w= min_width
+
         self.rect = pygame.Rect(x, y, w, h)
         self.center_x = center_x
         self.colour = (0,0,255)
@@ -365,12 +406,19 @@ class InputBox(object):
         self.font = font
         self.txt_surface = self.font.render (self.text, True, self.colour)
         self.min_width = min_width
+        self.max_width =max_width
         self.active = False
         self.highlightrect = pygame.Rect(x -2, y-2, w+4, h+4)
-        self.count = 1
+        self.framecount = 1
+
+        self.adjust()
 
     def adjust(self):
         width = max(200, self.txt_surface.get_width()+10)
+        if width >= self.min_width:
+            pass
+        else:
+            width = self.min_width
         self.rect.w = width
         self.highlightrect.w = width+4
 
@@ -385,9 +433,10 @@ class InputBox(object):
         )
 
     def add_character(self, char):
-        self.text = self.text + char
-        self.txt_surface = self.font.render(self.text, True, self.colour)
-        self.adjust() 
+        if self.rect.w <= self.max_width:
+            self.text = self.text + char
+            self.txt_surface = self.font.render(self.text, True, self.colour)
+            self.adjust()
 
     def remove_character(self):
         if len(self.text) >= 1:
@@ -399,17 +448,17 @@ class InputBox(object):
     def draw_input_box(self, game_state):
         fps = game_state.get('fps')
         game_surface = game_state.get('game_surface') 
-        game_surface.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        game_surface.blit(self.txt_surface, (self.center_x+5 - (self.txt_surface.get_width()/2), self.rect.y+5))
         pygame.draw.rect(game_surface, self.colour, self.rect, 2)
         if self.active == True:
             pygame.draw.rect(game_surface, self.highlight_colour, self.highlightrect, 2)
-            if self.count <= (fps/2):
-                self.count += 1
-            if self. count < fps and self.count > (fps/2):
-                self.count += 1
-                pygame.draw.line(game_surface,self.highlight_colour, (self.rect.x +5 +self.txt_surface.get_width(), self.rect.y +5), (self.rect.x +5 +self.txt_surface.get_width(), self.rect.y -5 +self.rect.h))
-            if self.count >= fps:
-                self.count =1
+            if self.framecount <= (fps/2):
+                self.framecount += 1
+            if self.framecount < fps and self.framecount > (fps/2):
+                self.framecount += 1
+                pygame.draw.line(game_surface,self.highlight_colour, (self.center_x +5 +(self.txt_surface.get_width()/2), self.rect.y +5), (self.center_x +5 +(self.txt_surface.get_width()/2), self.rect.y -5 +self.rect.h))
+            if self.framecount >= fps:
+                self.framecount =1
         
 
     def toggle_active(self):
