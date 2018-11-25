@@ -100,7 +100,7 @@ def workshop_loop(game_state):
     """The workshop screen loop.
     """
     built_sprites = game_state.get('built_sprites')
-    if len(built_sprites) > 2:
+    if len(built_sprites) > 2: # should be > 2
         #add a button to the workbench that says go to the world fair! which calls the function below
         game_state = end_game(game_state)
         return game_state
@@ -162,6 +162,7 @@ def workshop_loop(game_state):
     pic_frame_y = frame_y - screen_width*0.01
     i = 0
 
+    # Draw frames on the wall before adding images to them
     while (i < 3):
         general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
         pic_frame_x += screen_width*0.25

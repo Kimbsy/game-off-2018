@@ -83,4 +83,3 @@ while not done:
         game_state = game_end_loop(game_state)
 
 pygame.quit()
-quit()
