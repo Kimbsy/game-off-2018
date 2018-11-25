@@ -53,6 +53,7 @@ def start_splicer(game_state):
         return switch_to_screen(game_state, 'splicer_screen')
 
     print ('You must have two items to splice')
+    game_state = notify(game_state, 'warn', 'You must have two items to splice')
     return game_state
 
 def scroll_up(game_state, surface):
