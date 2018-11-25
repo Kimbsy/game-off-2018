@@ -16,7 +16,7 @@ dark_brown= (111,54,10)
 splice_sprites = pygame.sprite.OrderedUpdates()
 splice_thumbnails = pygame.sprite.Group()
 
-def load_buttons(game_state):
+def load_buttons(game_state, splice_canvas):
 
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
@@ -25,7 +25,7 @@ def load_buttons(game_state):
         ButtonSprite(0.15*x, 0.25*y, "crop 1", crop, ["1"]),
         ButtonSprite(0.05*x, 0.5*y, "add 2", add_2, []),
         ButtonSprite(0.15*x, 0.5*y, "crop 2", crop, ["2"]),
-        ButtonSprite(0.1*x, 0.8*y, "SPLICE", screenshot, []),
+        ButtonSprite(0.1*x, 0.8*y, "SPLICE", screenshot, [splice_canvas]),
         ButtonSprite(0.1*x, 0.85*y, 'Workshop!', switch_to_workshop, []),
         ButtonSprite(0.1*x, 0.9*y, 'QUIT', quit_game, []),
     )
@@ -49,17 +49,15 @@ def add_2(game_state):
     splice_sprites.add(ImageSprite(390, 363, game_state.get('active_sprite2')))
     return game_state
 
-def screenshot(game_state):
+def screenshot(game_state, splice_canvas):
     new_name = game_state.get('new_sprite_name')
     if not new_name:
         return notify(game_state, 'warn', 'Your sprite must have a name.')
-    print(new_name)
 
     # Choose a sellotape sound and begin playing it.
     sound_file = random.choice([
         'sellotape_001.wav',
         'sellotape_002.wav',
-        #'sellotape_003.wav',
     ])
     sellotape_sound = pygame.mixer.Sound(os.getcwd() + '/data/sounds/sellotape/' + sound_file)
     channel = pygame.mixer.Channel(0)
@@ -67,7 +65,7 @@ def screenshot(game_state):
     
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
-    rect = pygame.Rect(10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28)
+    rect = splice_canvas
 
     transparent_surface = pygame.Surface((display_width, display_height), pygame.SRCALPHA, 32)
     splice_sprites.draw(transparent_surface)
@@ -77,9 +75,6 @@ def screenshot(game_state):
     x = game_state.get('built_sprites')
     x.add(ThumbnailSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png", display_width*0.2, display_width*0.2))
     game_state.update({'built_sprites' : x})
-
-    for i in game_state.get('built_sprites'):
-        print(i.img_name)
 
     game_state.update({'latest_product': {
         'name': new_name,
@@ -122,13 +117,29 @@ def splicer_loop(game_state):
     game_surface = game_state.get('game_surface')
     click = game_state.get('click_sound')
     clock = game_state.get('clock')
+    fps = game_state.get('fps')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
     game_state.update({'crop_sprite' : None})
+    thumbnail_size = [0.2*display_width, 0.2*display_height]
     hover_rects1= []
     hover_rects2 = []
+
+    splice_canvas = pygame.Rect(0.35*display_width, 0.035*display_height, 0.635* display_width, 0.93*display_height) #set splice canvas area that is captured by screenshot.
     
-    active_input = InputBox(0.05*display_width, 0.125*display_height, 200, 0.1*display_height ,pygame.font.Font(None, 50) , (0,0,255), (255,255,0))
+    active_input = InputBox(
+        0.05*display_width,
+        0.0625*display_height,
+        0.2*display_height,
+        0.0625*display_height,
+        pygame.font.Font(None, 50),
+        (0,0,255),
+        (255,255,0),
+        0.175*display_width,
+        '',
+        0.25*display_width,
+        0.33*display_width
+        )
     # make the input box
 
     count = 0 # need to design this out. This is to do with making cropped sprites.
@@ -136,12 +147,13 @@ def splicer_loop(game_state):
     toast_stack = game_state.get('toast_stack')
 
     splice_sprites.empty()
-    splice_thumbnails.add(ThumbnailSprite(0.1*display_width, 0.3*display_height, active_sprite1, 0.2*display_width, 0.2*display_height))
-    splice_thumbnails.add(ThumbnailSprite(0.1*display_width, 0.55*display_height, active_sprite2, 0.2*display_width, 0.2*display_height))
+    splice_thumbnails.empty()
+    splice_thumbnails.add(ThumbnailSprite(0.175*display_width - (thumbnail_size[0]/4), 0.3*display_height, active_sprite1, thumbnail_size[0], thumbnail_size[1] ))
+    splice_thumbnails.add(ThumbnailSprite(0.175*display_width - (thumbnail_size[0]/4) , 0.55*display_height, active_sprite2,  thumbnail_size[0], thumbnail_size[1]))
 
     #make the thumbnails of your activesprites
 
-    load_buttons(game_state)
+    load_buttons(game_state, splice_canvas)
     
     # Want to move these elsewhere/design them away.
     dragging = False
@@ -155,7 +167,7 @@ def splicer_loop(game_state):
 
         if s:
             hover_rects1 = [s.rect]
-            if s.cropping == True:
+            if s.deletable == True:
                 hover_rects2 = [pygame.Rect(s.rect.x -2, s.rect.y-2 , 10, 10 ),
                                 pygame.Rect(s.rect.x + s.rect.w -8 , s.rect.y -2, 10, 10 ), 
                                 pygame.Rect(s.rect.x + s.rect.w -8, s.rect.y + s.rect.h -8, 10, 10 ),
@@ -164,7 +176,6 @@ def splicer_loop(game_state):
 
             else:
                 hover_rects2 = []
-
 
         else:
             hover_rects1 = []
@@ -178,7 +189,7 @@ def splicer_loop(game_state):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:    
                     if s:
-                        if s.cropping == True:
+                        if s.deletable == True:
                             splice_sprites.remove(s)
                         else:
                             dragging = True
@@ -187,12 +198,10 @@ def splicer_loop(game_state):
                             splice_sprites.add(s)
                     if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
                         active_input.toggle_active()
-                        
 
                 if event.button == 3:
                     if s:
-                        s.rotate45() # actually rotates 90 right now.
-                
+                        s.rotate_clockwise() # actually rotates 45 right now.
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
@@ -213,9 +222,13 @@ def splicer_loop(game_state):
                 active_input.event_handle(event) #Input Box Class has inbuilt event handling function for key down events.
             elif active_input.active == False:
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        if s:
-                            s.toggle_cropping()
+                    if s:
+                        if event.key == pygame.K_SPACE:
+                            s.toggle_deletable()
+                        if event.key == pygame.K_LEFT:
+                            s.rotate_counterclockwise()
+                        if event.key == pygame.K_RIGHT:
+                            s.rotate_clockwise()
 
         keys = pygame.key.get_pressed()
         if s:
@@ -223,7 +236,6 @@ def splicer_loop(game_state):
                 s.scale_up()
             if keys[pygame.K_DOWN]:
                 s.scale_down()
-
 
         if game_state.get('crop_sprite') != None and count ==0:
             splice_sprites.add(game_state.get('crop_sprite'))
@@ -233,7 +245,7 @@ def splicer_loop(game_state):
 
         # Display.
         game_surface.fill(dark_brown)
-        pygame.draw.rect(game_surface, white, (10*display_width/28,display_height/28, 16*display_width/28, 26*display_height/28))
+        pygame.draw.rect(game_surface, white, splice_canvas)
         splice_thumbnails.draw(game_surface)
         splice_sprites.draw(game_surface)
         draw_rects(hover_rects1, game_surface, black, 2)
@@ -244,6 +256,6 @@ def splicer_loop(game_state):
 
         pygame.display.update()
 
-        clock.tick(60)
+        clock.tick(fps)
 
     return game_state

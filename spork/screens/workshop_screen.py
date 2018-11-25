@@ -114,6 +114,7 @@ def workshop_loop(game_state):
 
     game_surface = game_state.get('game_surface')
     clock = game_state.get('clock')
+    fps = game_state.get('fps')
     click = game_state.get('click_sound')
     size = game_state.get('screen_size')
     screen_width = size[0]
@@ -130,26 +131,21 @@ def workshop_loop(game_state):
 
     background_image = ImageSprite(0, 0, os.getcwd() + '/data/workshop.png')
     general_sprites.add(background_image)
-    
 
     general_sprites.add(
         ButtonSprite(screen_width*0.5, screen_height*0.5, 'Splice!', start_splicer, [], color=(255,0,0), text_color=(0,0,0)),
         ButtonSprite(screen_width*0.8, screen_height*0.05, 'QUIT', quit_game, []),
     )
 
-
     items = os.listdir(os.getcwd() + '/data/pixel-components')
    
     x = 20
     y = 10
 
-    
     general_sprites.add(ButtonSprite(50, 50-20, 'Up', scroll_up, [scroll_surface], w = screen_width*0.25))
     general_sprites.add(ButtonSprite(50, screen_height*0.8 + 50, 'Down', scroll_down, [scroll_surface], screen_width*0.25))
 
-
     for item in items:
-
             item_file = os.getcwd() + '/data/pixel-components/' + item
             scrollable_sprites.add(ThumbnailSprite(x, y, item_file, 50, 50))
             item_text = item[6:-4]
@@ -225,11 +221,12 @@ def workshop_loop(game_state):
         toast_stack.draw(game_surface)
         game_surface.blit(scroll_surface, (50,50))
         
-        rendered_text = pygame.font.SysFont(None, 25).render(str(available_funds), True, (0,0,0))
+        funds_string = "Lifetime earnings: £{0:.2f}".format(available_funds)
+        rendered_text = pygame.font.SysFont(None, 25).render(funds_string, True, (0,0,0))
         game_surface.blit(rendered_text, (800, 50))
 
         pygame.display.update()
 
-        clock.tick(60)
+        clock.tick(fps)
 
     return game_state

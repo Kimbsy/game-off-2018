@@ -20,14 +20,18 @@ display_width = 1200
 display_height = 675
 game_surface = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Spork')
+icon = pygame.image.load(os.getcwd() + '/data/imgbase/sporktop.png')
+pygame.display.set_icon(icon)
+pygame.display.update()
 
 game_state = {
     'clock': clock,
+    'fps': 60,
     'game_surface': game_surface,
     'click_sound': pygame.mixer.Sound(os.getcwd() + '/data/sounds/click.wav'),
     'active_screen': 'main_menu_screen',
     'screen_done': False,
-    'company_name': 'KimbCass Inc.',
+    'company_name': '',
     'screen_done': False,
     'available_funds': 0.01,
     'quit': False,
