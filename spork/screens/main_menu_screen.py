@@ -35,24 +35,23 @@ def main_menu_loop(game_state):
     toast_stack = game_state.get('toast_stack')
     logo_sprites = pygame.sprite.OrderedUpdates()
     logo_sprites.add(
-    	ImageSprite(screen_width*0.31, screen_height*0.15, os.getcwd() +"/data/imgbase/sporklogo1.png"  )
+    	ImageSprite(screen_width*0.315, screen_height*0.15, os.getcwd() +"/data/imgbase/sporklogo1.png"  )
     	)
     company_name = game_state.get('company_name')
     input_font = pygame.font.Font(None, 50)
-    input_width, input_height = input_font.render(company_name, True, (0, 0, 0)).get_size()
-
-
+    #input_width, input_height = input_font.render(company_name, True, (0, 0, 0)).get_size()
+    input_width, input_height = 0.1* screen_width, 0.0625*screen_height
 
     company_name_input = InputBox(
         (0.5*screen_width) - (0.5*input_width),
-        0.7*screen_height,
+        0.68*screen_height,
         input_width + 10,
         input_height + 10,
         input_font,
         (0, 0, 255),
         (255, 255, 0),
-        text=company_name,
-        center_x=0.5*screen_width
+        center_x=0.5*screen_width,
+        text=company_name
     )
     company_name_input.active = True
 

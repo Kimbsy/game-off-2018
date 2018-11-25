@@ -21,6 +21,7 @@ game_surface = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Spork')
 icon = pygame.image.load(os.getcwd() + '/data/imgbase/sporktop.png')
 pygame.display.set_icon(icon)
+pygame.display.update()
 
 game_state = {
     'clock': clock,
