@@ -89,15 +89,13 @@ class ImageSprite(BaseSprite):
         self.rect.y += move[1]
 
     def rotate_clockwise(self):
-        self.rotation =self.rotation -30
-
+        self.rotation = self.rotation - 30
         if self.rotation == 360:
             self.rotation = 0
         self.update_sprite()
 
     def rotate_counterclockwise(self):
-        self.rotation =self.rotation + 30
-
+        self.rotation = self.rotation + 30
         if self.rotation == 360:
             self.rotation = 0
         self.update_sprite()
@@ -105,12 +103,10 @@ class ImageSprite(BaseSprite):
     def scale_down(self):
         if self.scale - 2 > 0:
             self.scale = self.scale - 2
-
         self.update_sprite()
 
     def scale_up(self):
         self.scale += 2
-
         self.update_sprite()
 
     def update_sprite(self):
@@ -146,13 +142,10 @@ class ButtonSprite(BaseSprite):
     def __init__(self, x, y, text, f, args, w = 100, h = 20):
         # Need to specify properties before init_img is called.
         self.text = text
-        self.w = 100
-        self.h = 20
         self.f = f
         self.args = args
         self.w = w
         self.h = h
-
 
         # Define button text font.
         self.font = pygame.font.SysFont(None, 25)
