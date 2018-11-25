@@ -22,11 +22,12 @@ pygame.display.set_caption('Spork')
 
 game_state = {
     'clock': clock,
+    'fps': 60,
     'game_surface': game_surface,
     'click_sound': pygame.mixer.Sound(os.getcwd() + '/data/sounds/click.wav'),
     'active_screen': 'main_menu_screen',
     'screen_done': False,
-    'company_name': 'KimbCass Inc.',
+    'company_name': '',
     'screen_done': False,
     'available_funds': 0.01,
     'quit': False,

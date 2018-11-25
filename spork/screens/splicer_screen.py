@@ -121,6 +121,7 @@ def splicer_loop(game_state):
     game_surface = game_state.get('game_surface')
     click = game_state.get('click_sound')
     clock = game_state.get('clock')
+    fps = game_state.get('fps')
     active_sprite1 = game_state.get('active_sprite1')
     active_sprite2 = game_state.get('active_sprite2')
     game_state.update({'crop_sprite' : None})
@@ -244,6 +245,6 @@ def splicer_loop(game_state):
 
         pygame.display.update()
 
-        clock.tick(60)
+        clock.tick(fps)
 
     return game_state

@@ -243,6 +243,7 @@ def result_loop(game_state):
     game_surface = game_state.get('game_surface')
     click = game_state.get('click_sound')
     clock = game_state.get('clock')
+    fps = game_state.get('fps')
     screen_size = game_state.get('screen_size')
     screen_width = screen_size[0]
     screen_height = screen_size[1]
@@ -321,6 +322,6 @@ def result_loop(game_state):
 
         toast_stack.draw(game_surface)
 
-        clock.tick(60)
+        clock.tick(fps)
 
     return game_state
