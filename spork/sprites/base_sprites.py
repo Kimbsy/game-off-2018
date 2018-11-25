@@ -145,27 +145,26 @@ class ButtonSprite(BaseSprite):
     """Sprite which displays as a clickable button with text.
     """
 
-    def __init__(self, x, y, text, f, args, w = 100, h = 20):
+    def __init__(self, x, y, text, f, args, w=100, h=20, color=(100,100,100), text_color=(200,200,200)):
         # Need to specify properties before init_img is called.
         self.text = text
-        self.w = 100
-        self.h = 20
         self.f = f
         self.args = args
         self.w = w
         self.h = h
+        self.color = color
+        self.text_color = text_color
 
 
         # Define button text font.
         self.font = pygame.font.SysFont(None, 25)
-        self.text_color = (200, 200, 200)
 
         # Call the parent constructor.
         super(ButtonSprite, self).__init__(x, y)
 
     def init_image(self):
         self.image = pygame.Surface((self.w, self.h))
-        self.image.fill((100, 100, 100))
+        self.image.fill(self.color)
         
         rendered_text = self.font.render(self.text, True, self.text_color)
         text_width, text_height = rendered_text.get_size()

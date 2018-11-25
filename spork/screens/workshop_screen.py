@@ -100,7 +100,8 @@ def workshop_loop(game_state):
     """The workshop screen loop.
     """
     built_sprites = game_state.get('built_sprites')
-    if len(built_sprites) > 9:
+    if len(built_sprites) > 2:
+        #add a button to the workbench that says go to the world fair! which calls the function below
         game_state = end_game(game_state)
         return game_state
 
@@ -121,7 +122,7 @@ def workshop_loop(game_state):
     toast_stack = game_state.get('toast_stack')
     available_funds = game_state.get('available_funds')
 
-    
+    held_down = False
 
     #scroll_rect = pygame.Rect(0,0,200,500)
     scroll_surface = pygame.surface.Surface((screen_width*0.25, screen_height*0.8))#200,500
@@ -132,8 +133,8 @@ def workshop_loop(game_state):
     
 
     general_sprites.add(
-        ButtonSprite(screen_width*0.3, screen_height*0.1, 'Splice!', start_splicer, []),
-        ButtonSprite(screen_width*0.5, screen_height*0.1, 'QUIT', quit_game, []),
+        ButtonSprite(screen_width*0.5, screen_height*0.5, 'Splice!', start_splicer, [], color=(255,0,0), text_color=(0,0,0)),
+        ButtonSprite(screen_width*0.8, screen_height*0.05, 'QUIT', quit_game, []),
     )
 
 
@@ -156,18 +157,21 @@ def workshop_loop(game_state):
             y += 75
 
     frame_x = screen_width*0.3
-    frame_y = screen_height*0.2
-    count = 0
+    frame_y = screen_height*0.1
+    pic_frame_x = frame_x - screen_width*0.01
+    pic_frame_y = frame_y - screen_width*0.01
+    i = 0
+
+    while (i < 3):
+        general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
+        pic_frame_x += screen_width*0.25
+        i += 1
 
     for keepsake in built_sprites:
-        if count == 5:
-            frame_y += 150
-            frame_x = screen_width*0.3
         keepsake.rect.x = frame_x
         keepsake.rect.y = frame_y
         general_sprites.add(keepsake)
-        frame_x += 150
-        count += 1
+        frame_x += screen_width*0.25
 
 
 
@@ -185,6 +189,7 @@ def workshop_loop(game_state):
                 elif scroll_rect.collidepoint(event.pos) and event.button == 5:
                     scroll_down(game_state, scroll_surface)
                 elif (event.button == 1):
+                    held_down = True
                     b = button_at_point(general_sprites, event.pos)
                     c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
                     if b:
@@ -194,6 +199,16 @@ def workshop_loop(game_state):
                     if c and scroll_rect.collidepoint(event.pos):
                         click.play()
                         game_state = c.on_click(game_state)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    held_down = False
+
+        # Needed to hold down up and down scroll buttons
+        if held_down:
+            b = button_at_point(general_sprites, pygame.mouse.get_pos())
+            if b:
+                game_state = b.on_click(game_state)
+
 
         # Update.
         toast_stack.update()

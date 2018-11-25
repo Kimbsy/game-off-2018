@@ -75,7 +75,7 @@ def screenshot(game_state):
 
     pygame.image.save(sub, os.getcwd() + "/data/temp/" + new_name + ".png")
     x = game_state.get('built_sprites')
-    x.add(ThumbnailSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png", 100, 100))
+    x.add(ThumbnailSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png", display_width*0.2, display_width*0.2))
     game_state.update({'built_sprites' : x})
 
     for i in game_state.get('built_sprites'):
