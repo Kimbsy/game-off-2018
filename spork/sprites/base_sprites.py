@@ -329,7 +329,6 @@ class ThumbnailSprite(ImageSprite):
 
         self.is_draggable = False
 
-
     def init_image(self):
         # Load the image from file and scale it to thumbnail size.
         loaded_img = pygame.image.load(self.img_name)
