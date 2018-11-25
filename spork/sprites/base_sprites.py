@@ -356,7 +356,7 @@ class InputBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
 
-    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text ='', center_x=None):
+    def __init__(self, x, y, w, h, font, inactive_colour, active_colour, text ='', center_x=None, min_width = 100):
         self.rect = pygame.Rect(x, y, w, h)
         self.center_x = center_x
         self.colour = (0,0,255)
@@ -364,8 +364,10 @@ class InputBox(object):
         self.text = text
         self.font = font
         self.txt_surface = self.font.render (self.text, True, self.colour)
+        self.min_width = min_width
         self.active = False
         self.highlightrect = pygame.Rect(x -2, y-2, w+4, h+4)
+        self.count = 1
 
     def adjust(self):
         width = max(200, self.txt_surface.get_width()+10)
@@ -395,11 +397,19 @@ class InputBox(object):
 
       
     def draw_input_box(self, game_state):
+        fps = game_state.get('fps')
         game_surface = game_state.get('game_surface') 
         game_surface.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         pygame.draw.rect(game_surface, self.colour, self.rect, 2)
         if self.active == True:
             pygame.draw.rect(game_surface, self.highlight_colour, self.highlightrect, 2)
+            if self.count <= (fps/2):
+                self.count += 1
+            if self. count < fps and self.count > (fps/2):
+                self.count += 1
+                pygame.draw.line(game_surface,self.highlight_colour, (self.rect.x +5 +self.txt_surface.get_width(), self.rect.y +5), (self.rect.x +5 +self.txt_surface.get_width(), self.rect.y -5 +self.rect.h))
+            if self.count >= fps:
+                self.count =1
         
 
     def toggle_active(self):
@@ -412,9 +422,12 @@ class InputBox(object):
 
     def event_handle(self, event):
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
-                self.remove_character()
+        # if event.type == pygame.KEYDOWN:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_BACKSPACE]:
+            self.remove_character()
+            return
 
-            else:
-                self.add_character(event.unicode)
+        if event.type == pygame.KEYDOWN:
+            self.add_character(event.unicode)
+            return

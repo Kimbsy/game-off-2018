@@ -106,6 +106,7 @@ def workshop_loop(game_state):
 
     game_surface = game_state.get('game_surface')
     clock = game_state.get('clock')
+    fps = game_state.get('fps')
     click = game_state.get('click_sound')
     size = game_state.get('screen_size')
     screen_width = size[0]
@@ -209,6 +210,6 @@ def workshop_loop(game_state):
 
         pygame.display.update()
 
-        clock.tick(60)
+        clock.tick(fps)
 
     return game_state
