@@ -36,7 +36,7 @@ def add_to_workbench(game_state, item_file):
     return game_state
 
 def remove_workbench_item(game_state, side):
-    #empty the gamestate of options to splice and remove images
+    #empty the game_state of options to splice and remove images
     if side == 'left':
         game_state.update({'active_sprite1': None})
         left_sprite.empty()
@@ -82,6 +82,9 @@ def scroll_down(game_state, surface):
 
     return game_state
 
+def end_game(game_state):
+    return switch_to_screen(game_state, 'game_end_screen')
+
 
 # Main group of sprites to display.
 general_sprites = pygame.sprite.OrderedUpdates()
@@ -96,6 +99,11 @@ right_remove_button = ButtonSprite(700, 400, 'X', remove_workbench_item, ['right
 def workshop_loop(game_state):
     """The workshop screen loop.
     """
+    built_sprites = game_state.get('built_sprites')
+    if len(built_sprites) > 2: # should be > 2
+        #add a button to the workbench that says go to the world fair! which calls the function below
+        game_state = end_game(game_state)
+        return game_state
 
     #remove all sprites from previous time screen was open
     general_sprites.empty()
@@ -115,6 +123,8 @@ def workshop_loop(game_state):
     toast_stack = game_state.get('toast_stack')
     available_funds = game_state.get('available_funds')
 
+    held_down = False
+
     #scroll_rect = pygame.Rect(0,0,200,500)
     scroll_surface = pygame.surface.Surface((screen_width*0.25, screen_height*0.8))#200,500
     scroll_rect = scroll_surface.get_rect(x=50, y=50)
@@ -123,8 +133,8 @@ def workshop_loop(game_state):
     general_sprites.add(background_image)
 
     general_sprites.add(
-        ButtonSprite(screen_width*0.3, screen_height*0.1, 'Splice!', start_splicer, []),
-        ButtonSprite(screen_width*0.5, screen_height*0.1, 'QUIT', quit_game, []),
+        ButtonSprite(screen_width*0.5, screen_height*0.5, 'Splice!', start_splicer, [], color=(255,0,0), text_color=(0,0,0)),
+        ButtonSprite(screen_width*0.8, screen_height*0.05, 'QUIT', quit_game, []),
     )
 
     items = os.listdir(os.getcwd() + '/data/pixel-components')
@@ -142,23 +152,25 @@ def workshop_loop(game_state):
             scrollable_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file], w = 150))
             y += 75
 
-    frame_x1 = screen_width*0.3
-    frame_x2 = screen_width*0.3
-    frame_y = screen_height*0.2
-    count = 1
+    frame_x = screen_width*0.3
+    frame_y = screen_height*0.1
+    pic_frame_x = frame_x - screen_width*0.01
+    pic_frame_y = frame_y - screen_width*0.01
+    i = 0
 
-    keepsakes = os.listdir(os.getcwd() + '/data/temp')
-    for keepsake in keepsakes:
-        item_file = os.getcwd() + '/data/temp/' + keepsake
-        if count<=5:
-            general_sprites.add(ThumbnailSprite(frame_x1,frame_y, os.getcwd()+'/data/frame.png', 100, 100))
-            general_sprites.add(ThumbnailSprite(frame_x1+15, frame_y+20, item_file, 80, 80))
-            frame_x1 += 150
-            count += 1
-        else:
-            general_sprites.add(ThumbnailSprite(frame_x2,frame_y + 120, os.getcwd()+'/data/frame.png', 100, 100))
-            general_sprites.add(ThumbnailSprite(frame_x2+15, frame_y+140, item_file, 80, 80))
-            frame_x2 += 150
+    # Draw frames on the wall before adding images to them
+    while (i < 3):
+        general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
+        pic_frame_x += screen_width*0.25
+        i += 1
+
+    for keepsake in built_sprites:
+        keepsake.rect.x = frame_x
+        keepsake.rect.y = frame_y
+        general_sprites.add(keepsake)
+        frame_x += screen_width*0.25
+
+
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
@@ -174,6 +186,7 @@ def workshop_loop(game_state):
                 elif scroll_rect.collidepoint(event.pos) and event.button == 5:
                     scroll_down(game_state, scroll_surface)
                 elif (event.button == 1):
+                    held_down = True
                     b = button_at_point(general_sprites, event.pos)
                     c = button_at_point(scrollable_sprites, (event.pos[0]-50,event.pos[1]-50))
                     if b:
@@ -183,6 +196,16 @@ def workshop_loop(game_state):
                     if c and scroll_rect.collidepoint(event.pos):
                         click.play()
                         game_state = c.on_click(game_state)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    held_down = False
+
+        # Needed to hold down up and down scroll buttons
+        if held_down:
+            b = button_at_point(general_sprites, pygame.mouse.get_pos())
+            if b:
+                game_state = b.on_click(game_state)
+
 
         # Update.
         toast_stack.update()

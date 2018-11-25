@@ -73,7 +73,7 @@ def screenshot(game_state, splice_canvas):
 
     pygame.image.save(sub, os.getcwd() + "/data/temp/" + new_name + ".png")
     x = game_state.get('built_sprites')
-    x.add(ImageSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png"))
+    x.add(ThumbnailSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png", display_width*0.2, display_width*0.2))
     game_state.update({'built_sprites' : x})
 
     game_state.update({'latest_product': {
