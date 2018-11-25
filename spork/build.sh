@@ -1,3 +1,4 @@
+rm -rf build
 python3 setup.py build
 
 pushd .
