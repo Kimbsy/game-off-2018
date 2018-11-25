@@ -100,7 +100,7 @@ def workshop_loop(game_state):
     """The workshop screen loop.
     """
     built_sprites = game_state.get('built_sprites')
-    if len(built_sprites) > 2: # should be > 2
+    if len(built_sprites) > 0: # should be > 2
         #add a button to the workbench that says go to the world fair! which calls the function below
         game_state = end_game(game_state)
         return game_state

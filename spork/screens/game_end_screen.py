@@ -17,6 +17,13 @@ general_sprites = pygame.sprite.OrderedUpdates()
 frame_sprites = pygame.sprite.Group()
 background_sprite = pygame.sprite.Group()
 
+def blimp_screen(game_state, sprite):
+    sprite.rect.x = 10
+    sprite.rect.y = 10
+    general_sprites.add(sprite)
+
+    return game_state
+
 
 def game_end_loop(game_state):
     #The game end screen loop.
@@ -46,14 +53,14 @@ def game_end_loop(game_state):
 
     # Draw frames on the wall before adding images to them
     while (i < 3):
-        frame_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
+        general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
         pic_frame_x += screen_width*0.25
         i += 1
 
     for keepsake in built_sprites:
         keepsake.rect.x = frame_x
         keepsake.rect.y = frame_y
-        general_sprites.add(keepsake)
+        frame_sprites.add(keepsake)
         frame_x += screen_width*0.25
 
 
@@ -73,6 +80,10 @@ def game_end_loop(game_state):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 
                 if (event.button == 1):
+                    for sprite in frame_sprites:
+                        if sprite.rect.collidepoint(pygame.mouse.get_pos()):
+                            game_state = blimp_screen(game_state, sprite)
+
                     b = button_at_point(general_sprites, event.pos)
                     if b:
                         click.play()
@@ -84,8 +95,8 @@ def game_end_loop(game_state):
         # Display.
         game_surface.fill((255, 0, 0))
         background_sprite.draw(game_surface)
-        frame_sprites.draw(game_surface)
         general_sprites.draw(game_surface)
+        frame_sprites.draw(game_surface)
         
         toast_stack.draw(game_surface)
         
