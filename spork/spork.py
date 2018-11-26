@@ -42,6 +42,7 @@ game_state = {
     'active_music': 'Komiku_Glouglou.mp3',
     'music_done': True,
     'delete_mode': False,
+    'copy_mode': False,
 }
 
 done = False

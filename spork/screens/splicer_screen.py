@@ -45,7 +45,7 @@ def load_buttons(game_state, splice_canvas):
         ButtonImage(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/" +"mirrorbuttonsmall.png", add_sprite, ["2", True]),
         ButtonImage(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/" + "mirrorcropbuttonsmall.png", crop, ["2", True]),
 
-        ButtonImage(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/" +"copybuttonsmall.png", dud, []),
+        ButtonImage(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/" +"copybuttonsmall.png", toggle_copy_mode, []),
         ButtonImage(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/" +"delbuttonsmall.png", toggle_delete_mode, []),
 
 
@@ -59,6 +59,7 @@ def load_buttons(game_state, splice_canvas):
 def switch_to_workshop(game_state):
     game_state.update({'active_screen': 'workshop_screen'})
     game_state.update({'screen_done': True})
+    pygame.mouse.set_cursor(*pygame.cursors.arrow)
     return game_state
 
 def quit_game(game_state):
@@ -72,12 +73,30 @@ def dud(game_state): #holding function for buttons that don't do anything yet.
 
 def toggle_delete_mode(game_state):
     delete_mode = game_state.get('delete_mode')
+    copy_mode = game_state.get('copy_mode')
+
     if delete_mode == False:
         game_state.update({'delete_mode': True})
+        game_state.update({'copy_mode': False})
         pygame.mouse.set_cursor(*pygame.cursors.broken_x)
         return game_state
     if delete_mode == True:
         game_state.update({'delete_mode': False})
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
+        return game_state
+
+    return game_state
+
+def toggle_copy_mode(game_state):
+    delete_mode = game_state.get('delete_mode')
+    copy_mode = game_state.get('copy_mode')
+    if copy_mode == False:
+        game_state.update({'copy_mode': True})
+        game_state.update({'delete_mode': False})
+        pygame.mouse.set_cursor(*pygame.cursors.diamond)
+        return game_state
+    if copy_mode == True:
+        game_state.update({'copy_mode': False})
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
         return game_state
 
@@ -152,6 +171,7 @@ def screenshot(game_state, splice_canvas):
     # Wait for sellotape sound to finish.
     while channel.get_busy():
         pass
+    pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
     return switch_to_screen(game_state, 'result_screen')
 
@@ -190,7 +210,7 @@ def splicer_loop(game_state):
     thumbnail_size = [0.2*display_width, 0.2*display_height]
     hover_rects1= []
     hover_rects2 = []
-    delete_mode = game_state.get('delete_mode')
+    delete_mode = game_state.update({'delete_mode': False })
 
     splice_canvas = pygame.Rect(0.35*display_width, 0.035*display_height, 0.635* display_width, 0.93*display_height) #set splice canvas area that is captured by screenshot.
     
