@@ -35,7 +35,7 @@ def load_buttons(game_state, splice_canvas):
     
 
     splice_sprites.add(
-        ButtonImage(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/" + "addbuttonsmall.png", add_sprite, ["1"]),
+        ButtonImage(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["1"]),
         ButtonImage(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/" + "cropbuttonsmall.png", crop, ["1"]),
         ButtonImage(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/" +"mirrorbuttonsmall.png", add_sprite, ["1", True]),
         ButtonImage(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/" + "mirrorcropbuttonsmall.png", crop, ["1", True] ),
