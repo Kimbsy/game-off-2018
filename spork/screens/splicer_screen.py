@@ -210,7 +210,8 @@ def splicer_loop(game_state):
     thumbnail_size = [0.2*display_width, 0.2*display_height]
     hover_rects1= []
     hover_rects2 = []
-    delete_mode = game_state.update({'delete_mode': False })
+    game_state.update({'delete_mode': False })
+    game_state.update({'copy_mode': False})
 
     splice_canvas = pygame.Rect(0.35*display_width, 0.035*display_height, 0.635* display_width, 0.93*display_height) #set splice canvas area that is captured by screenshot.
     
@@ -288,10 +289,6 @@ def splicer_loop(game_state):
                             splice_sprites.add(s)
                     if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
                         active_input.toggle_active()
-
-                if event.button == 3:
-                    if s:
-                        s.rotate_clockwise() # actually rotates 45 right now.
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
