@@ -9,7 +9,7 @@ from screens.game_end_screen import game_end_loop
 
 from sprites.base_sprites import ToastStack
 
-# Initialise psygame stuff.
+# Initialise pygame stuff.
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
 pygame.mixer.quit() # Hack to stop sound lagging.
