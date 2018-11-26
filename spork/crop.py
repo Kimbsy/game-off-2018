@@ -32,10 +32,14 @@ def displayImage(screen, px, topleft, prior):
 
     # return current box extents
     return (x, y, width, height)
-def setup(path):
+def setup(path, mirror = False):
     px = pygame.image.load(path)
+    
     screen = pygame.display.set_mode( px.get_rect()[2:] )
     screen.blit(px, px.get_rect())
+    # if mirror == True:
+    #     px= pygame.transform.flip(px, True, False),
+    
     pygame.display.flip()
     return screen, px
 

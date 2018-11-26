@@ -9,7 +9,7 @@ from screens.game_end_screen import game_end_loop
 
 from sprites.base_sprites import ToastStack
 
-# Initialise pygame stuff.
+# Initialise psygame stuff.
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
 pygame.mixer.quit() # Hack to stop sound lagging.
@@ -42,6 +42,7 @@ game_state = {
     'built_sprites': built_sprites,
     'active_music': 'Komiku_Glouglou.mp3',
     'music_done': True,
+    'delete_mode': True,
 }
 
 done = False

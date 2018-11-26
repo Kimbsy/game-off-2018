@@ -16,12 +16,13 @@ dark_brown= (111,54,10)
 splice_sprites = pygame.sprite.OrderedUpdates()
 splice_thumbnails = pygame.sprite.Group()
 
+
 def load_buttons(game_state, splice_canvas):
 
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
     
-    helpbutton =ButtonImage(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/" + "helpbuttonsmall.png", mirror, [])
+    helpbutton =ButtonImage(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/" + "helpbuttonsmall.png", dud, [])
     helpbutton.rect.centerx = 0.28*x - ((0.07*x-70)/2)
     workshop=ButtonSprite(0.25*x, 0.92*y, 'WORKSHOP', switch_to_workshop, [])
     workshop.rect.centerx = 0.28*x - ((0.07*x-70)/2)
@@ -34,18 +35,18 @@ def load_buttons(game_state, splice_canvas):
     
 
     splice_sprites.add(
-        ButtonImage(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/" + "addbuttonsmall.png", add_1, []),
+        ButtonImage(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/" + "addbuttonsmall.png", add_sprite, ["1"]),
         ButtonImage(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/" + "cropbuttonsmall.png", crop, ["1"]),
-        ButtonImage(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/" +"mirrorbuttonsmall.png", mirror, []),
-        ButtonImage(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/" + "mirrorcropbuttonsmall.png", crop, ["1"]),
+        ButtonImage(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/" +"mirrorbuttonsmall.png", add_sprite, ["1", True]),
+        ButtonImage(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/" + "mirrorcropbuttonsmall.png", crop, ["1", True] ),
 
-        ButtonImage(0.21*x, 0.43*y, os.getcwd() + "/data/imgbase/" + "addbuttonsmall.png", add_2, []),
+        ButtonImage(0.21*x, 0.43*y, os.getcwd() + "/data/imgbase/" + "addbuttonsmall.png", add_sprite, ["2"]),
         ButtonImage(0.28*x, 0.43*y, os.getcwd() + "/data/imgbase/" + "cropbuttonsmall.png", crop, ["2"]),
-        ButtonImage(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/" +"mirrorbuttonsmall.png", mirror, []),
-        ButtonImage(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/" + "mirrorcropbuttonsmall.png", crop, ["2"]),
+        ButtonImage(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/" +"mirrorbuttonsmall.png", add_sprite, ["2", True]),
+        ButtonImage(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/" + "mirrorcropbuttonsmall.png", crop, ["2", True]),
 
-        ButtonImage(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/" +"copybuttonsmall.png", mirror, []),
-        ButtonImage(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/" +"delbuttonsmall.png", mirror, []),
+        ButtonImage(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/" +"copybuttonsmall.png", dud, []),
+        ButtonImage(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/" +"delbuttonsmall.png", toggle_delete_mode, []),
 
 
         splice,
@@ -65,17 +66,52 @@ def quit_game(game_state):
     game_state.update({'screen_done': True})
     return game_state
 
-def mirror(game_state):
+def dud(game_state): #holding function for buttons that don't do anything yet.
     print("BOO")
     return game_state
 
-def add_1(game_state):
-    splice_sprites.add(ImageSprite(490, 363, game_state.get('active_sprite1')))
+def toggle_delete_mode(game_state):
+    delete_mode = game_state.get('delete_mode')
+    if delete_mode == False:
+        game_state.update({'delete_mode': True})
+        return game_state
+    if delete_mode == True:
+        game_state.update({'delete_mode': False})
+        return game_state
+
     return game_state
 
-def add_2(game_state):
-    splice_sprites.add(ImageSprite(390, 363, game_state.get('active_sprite2')))
+def add_sprite(game_state, num, mirror = False ):
+    x = game_state.get('screen_size')[0]
+    y = game_state.get('screen_size')[1]
+    locationx =0
+
+    if num == "1":
+        locationx = 0.5*x
+    elif num == "2":
+        locationx = 0.7*x
+    else:
+        return game_state
+    tempsprite = ImageSprite(locationx, 0.5*y, game_state.get('active_sprite' +num))
+    
+    if mirror == True:
+        tempsprite.image = pygame.transform.flip(tempsprite.image, True,False)
+        tempsprite.origimage = pygame.transform.flip(tempsprite.origimage, True, False)
+    
+    tempsprite.image= aspect_scale(tempsprite.image, (0.25*x, 0.25*y))
+
+    # tempsprite.rect = tempsprite.image.get_rect()
+    # if tempsprite.rect.x < tempsprite.orig_width:
+    #     tempsprite.scale = (100*tempsprite.rect.x)/ tempsprite.orig_width
+
+
+    tempsprite.rect.center = (locationx, 0.5*y)
+    splice_sprites.add(tempsprite)
     return game_state
+
+# def add_2(game_state):
+#     splice_sprites.add(ImageSprite(390, 363, game_state.get('active_sprite' + num)))
+#     return game_state
 
 def screenshot(game_state, splice_canvas):
     new_name = game_state.get('new_sprite_name')
@@ -117,8 +153,8 @@ def screenshot(game_state, splice_canvas):
 
     return switch_to_screen(game_state, 'result_screen')
 
-def crop(game_state, num):
-    screen, px = setup(game_state.get('active_sprite' + num))
+def crop(game_state, num, mirror = False):
+    screen, px = setup(game_state.get('active_sprite' + num), mirror)
     left, upper, right, lower = cropLoop(screen, px)
 
     if right < left:
@@ -152,6 +188,7 @@ def splicer_loop(game_state):
     thumbnail_size = [0.2*display_width, 0.2*display_height]
     hover_rects1= []
     hover_rects2 = []
+    delete_mode = game_state.get('delete_mode')
 
     splice_canvas = pygame.Rect(0.35*display_width, 0.035*display_height, 0.635* display_width, 0.93*display_height) #set splice canvas area that is captured by screenshot.
     
@@ -220,7 +257,7 @@ def splicer_loop(game_state):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:    
                     if s:
-                        if s.deletable == True:
+                        if game_state.get('delete_mode') == True:
                             splice_sprites.remove(s)
                         else:
                             dragging = True
