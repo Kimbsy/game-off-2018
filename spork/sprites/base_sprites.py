@@ -13,7 +13,7 @@ def button_at_point(sprites, pos):
     for sprite in sprites.sprites():
         if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
             return sprite
-        elif (type(sprite) is ButtonImage) and sprite.rect.collidepoint(pos):
+        elif (type(sprite) is ButtonImageSprite) and sprite.rect.collidepoint(pos):
             return sprite
 
 
@@ -181,11 +181,8 @@ class ButtonImageSprite(BaseSprite):
         self.img_path = img_path
         self.f = f
         self.args = args
-         
-
+        
         super(ButtonImageSprite, self).__init__(x,y)
-
-    
 
     def init_image(self):
         loaded_img = pygame.image.load(self.img_path)
