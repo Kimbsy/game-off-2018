@@ -172,7 +172,7 @@ class ButtonSprite(BaseSprite):
         """
         return self.f(game_state, *self.args)
 
-class ButtonImage(BaseSprite):
+class ButtonImageSprite(BaseSprite):
     "clickable image that performs a function"
 
     def __init__(self,x ,y, img_path, f, args):
@@ -183,7 +183,7 @@ class ButtonImage(BaseSprite):
         self.args = args
          
 
-        super(ButtonImage, self).__init__(x,y)
+        super(ButtonImageSprite, self).__init__(x,y)
 
     
 
