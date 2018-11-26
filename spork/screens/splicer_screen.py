@@ -23,7 +23,7 @@ def load_buttons(game_state, splice_canvas):
     y = game_state.get('screen_size')[1]
     
     helpbutton =ButtonImage(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/" + "helpbuttonsmall.png", dud, [])
-    helpbutton.rect.centerx = 0.28*x - ((0.07*x-70)/2)
+    helpbutton.rect.centerx = (0.28 * x) - (((0.07 * x) - 70) / 2)
     workshop=ButtonSprite(0.25*x, 0.92*y, 'WORKSHOP', switch_to_workshop, [])
     workshop.rect.centerx = 0.28*x - ((0.07*x-70)/2)
     quit =ButtonSprite(0.25*x, 0.96*y, 'QUIT', quit_game, [])
