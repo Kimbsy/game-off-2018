@@ -68,7 +68,7 @@ def quit_game(game_state):
     return game_state
 
 def dud(game_state): #holding function for buttons that don't do anything yet.
-    print("BOO")
+    pass
     return game_state
 
 def toggle_delete_mode(game_state):
