@@ -13,6 +13,8 @@ def button_at_point(sprites, pos):
     for sprite in sprites.sprites():
         if (type(sprite) is ButtonSprite) and sprite.rect.collidepoint(pos):
             return sprite
+        elif (type(sprite) is ButtonImageSprite) and sprite.rect.collidepoint(pos):
+            return sprite
 
 
 class BaseSprite(pygame.sprite.Sprite):
@@ -164,6 +166,32 @@ class ButtonSprite(BaseSprite):
         x_offset = (self.w / 2) - (text_width / 2)
         y_offset = (self.h / 2) - (text_height / 2)
         self.image.blit(rendered_text, (x_offset, y_offset))
+
+    def on_click(self, game_state):
+        """Invoke the on_click function.
+        """
+        return self.f(game_state, *self.args)
+
+class ButtonImageSprite(BaseSprite):
+    "clickable image that performs a function"
+
+    def __init__(self,x ,y, img_path, f, args):
+        self.x = x
+        self.y = y
+        self.img_path = img_path
+        self.f = f
+        self.args = args
+        
+        super(ButtonImageSprite, self).__init__(x,y)
+
+    def init_image(self):
+        loaded_img = pygame.image.load(self.img_path)
+        size = loaded_img.get_size()
+
+        # Create a surface containing the image with a transparent
+        # background.
+        self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
+        self.image.blit(loaded_img, (0, 0))
 
     def on_click(self, game_state):
         """Invoke the on_click function.

@@ -43,7 +43,6 @@ def main_menu_loop(game_state):
     )
     company_name = game_state.get('company_name')
     input_font = pygame.font.Font(None, 50)
-    #input_width, input_height = input_font.render(company_name, True, (0, 0, 0)).get_size()
     input_width, input_height = 0.1* screen_width, 0.0625*screen_height
 
     company_name_input = InputBox(
