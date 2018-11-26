@@ -49,21 +49,22 @@ def cropLoop(screen, px):
     n=0
     x=0
     while n!=1:
-        # if screen.get_rect().collidepoint(pygame.mouse.get_pos()) == True:
-        #     print("TRUE")
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x=1
-            if x ==1:
-                if event.type == pygame.MOUSEBUTTONUP:
-                    if not topleft:
-                        topleft = event.pos
-                    else:
-                        bottomright = event.pos
-                        n=1
-        if topleft:
-            prior = displayImage(screen, px, topleft, prior)
-    return ( topleft + bottomright )
+        if px.get_rect().collidepoint(pygame.mouse.get_pos()) == True:
+              
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x=1
+                if x ==1:
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        if not topleft:
+                            topleft = event.pos
+                        else:
+                            bottomright = event.pos
+                            n=1
+            if topleft:
+                prior = displayImage(screen, px, topleft, prior)
+            if bottomright:
+                return ( topleft + bottomright )
 
 if __name__ == "__main__":
     input_loc = 'u.png'

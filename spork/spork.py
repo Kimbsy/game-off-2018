@@ -38,11 +38,10 @@ game_state = {
     'screen_size': (display_width, display_height),
     'active_sprite1': None,
     'active_sprite2': None,
-    'crop_sprite': None,
     'built_sprites': built_sprites,
     'active_music': 'Komiku_Glouglou.mp3',
     'music_done': True,
-    'delete_mode': True,
+    'delete_mode': False,
 }
 
 done = False

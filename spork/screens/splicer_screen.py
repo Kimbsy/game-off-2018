@@ -74,9 +74,11 @@ def toggle_delete_mode(game_state):
     delete_mode = game_state.get('delete_mode')
     if delete_mode == False:
         game_state.update({'delete_mode': True})
+        pygame.mouse.set_cursor(*pygame.cursors.broken_x)
         return game_state
     if delete_mode == True:
         game_state.update({'delete_mode': False})
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
         return game_state
 
     return game_state
@@ -89,7 +91,7 @@ def add_sprite(game_state, num, mirror = False ):
     if num == "1":
         locationx = 0.5*x
     elif num == "2":
-        locationx = 0.7*x
+        locationx = 0.85*x
     else:
         return game_state
     tempsprite = ImageSprite(locationx, 0.5*y, game_state.get('active_sprite' +num))
@@ -97,23 +99,23 @@ def add_sprite(game_state, num, mirror = False ):
     if mirror == True:
         tempsprite.image = pygame.transform.flip(tempsprite.image, True,False)
         tempsprite.origimage = pygame.transform.flip(tempsprite.origimage, True, False)
-    
-    tempsprite.image= aspect_scale(tempsprite.image, (0.25*x, 0.25*y))
+    if tempsprite.orig_width >= tempsprite.orig_height:
+        factor = 0.25*x/ tempsprite.orig_width
+    elif tempsprite.orig_width < tempsprite.orig_height:
+        factor = 0.5*y/ tempsprite.orig_height
 
-    # tempsprite.rect = tempsprite.image.get_rect()
-    # if tempsprite.rect.x < tempsprite.orig_width:
-    #     tempsprite.scale = (100*tempsprite.rect.x)/ tempsprite.orig_width
 
+    tempsprite.scale = 100*factor
 
     tempsprite.rect.center = (locationx, 0.5*y)
+    tempsprite.update_sprite()
+       
     splice_sprites.add(tempsprite)
     return game_state
 
-# def add_2(game_state):
-#     splice_sprites.add(ImageSprite(390, 363, game_state.get('active_sprite' + num)))
-#     return game_state
-
 def screenshot(game_state, splice_canvas):
+    
+    rect = splice_canvas
     new_name = game_state.get('new_sprite_name')
     if not new_name:
         return notify(game_state, 'warn', 'Your invention must have a name.')
@@ -129,7 +131,7 @@ def screenshot(game_state, splice_canvas):
     
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
-    rect = splice_canvas
+    
 
     transparent_surface = pygame.Surface((display_width, display_height), pygame.SRCALPHA, 32)
     splice_sprites.draw(transparent_surface)
@@ -169,7 +171,7 @@ def crop(game_state, num, mirror = False):
     display_height = 675
     game_state.update({'game_surface': pygame.display.set_mode((display_width, display_height))})
     crop_sprite = (ImageSprite(490, 263, os.getcwd()+ '/outie.png'))
-    game_state.update({'crop_sprite' : crop_sprite})
+    splice_sprites.add(crop_sprite)
 
     return game_state
 
@@ -305,10 +307,7 @@ def splicer_loop(game_state):
             if keys[pygame.K_DOWN]:
                 s.scale_down()
 
-        if game_state.get('crop_sprite') != None and count ==0:
-            splice_sprites.add(game_state.get('crop_sprite'))
-
-        # Update.
+           # Update.
         toast_stack.update()
 
         # Display.
