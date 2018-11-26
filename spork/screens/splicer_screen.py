@@ -4,7 +4,7 @@ import pygame, os, random
 from helpers import *
 from crop import *
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point, ThumbnailSprite, ButtonImage
+from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point, ThumbnailSprite, ButtonImageSprite
 
 pygame.init()
 
@@ -22,31 +22,31 @@ def load_buttons(game_state, splice_canvas):
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
     
-    helpbutton =ButtonImage(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/" + "helpbuttonsmall.png", dud, [])
+    helpbutton =ButtonImageSprite(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/helpbuttonsmall.png", dud, [])
     helpbutton.rect.centerx = (0.28 * x) - (((0.07 * x) - 70) / 2)
     workshop=ButtonSprite(0.25*x, 0.92*y, 'WORKSHOP', switch_to_workshop, [])
     workshop.rect.centerx = 0.28*x - ((0.07*x-70)/2)
     quit =ButtonSprite(0.25*x, 0.96*y, 'QUIT', quit_game, [])
     quit.rect.centerx = 0.28*x - ((0.07*x-70)/2)
 
-    splice =ButtonImage(0.05*x, 0.68*y, os.getcwd() + "/data/imgbase/" + "splicebuttonsmall.png", screenshot, [splice_canvas])
+    splice =ButtonImageSprite(0.05*x, 0.68*y, os.getcwd() + "/data/imgbase/" + "splicebuttonsmall.png", screenshot, [splice_canvas])
     splice.rect.centerx = 0.11*x
 
     
 
     splice_sprites.add(
-        ButtonImage(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["1"]),
-        ButtonImage(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["1"]),
-        ButtonImage(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["1", True]),
-        ButtonImage(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["1", True] ),
+        ButtonImageSprite(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["1"]),
+        ButtonImageSprite(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["1"]),
+        ButtonImageSprite(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["1", True]),
+        ButtonImageSprite(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["1", True] ),
 
-        ButtonImage(0.21*x, 0.43*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["2"]),
-        ButtonImage(0.28*x, 0.43*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["2"]),
-        ButtonImage(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["2", True]),
-        ButtonImage(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["2", True]),
+        ButtonImageSprite(0.21*x, 0.43*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["2"]),
+        ButtonImageSprite(0.28*x, 0.43*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["2"]),
+        ButtonImageSprite(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["2", True]),
+        ButtonImageSprite(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["2", True]),
 
-        ButtonImage(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/copybuttonsmall.png", toggle_copy_mode, []),
-        ButtonImage(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/delbuttonsmall.png", toggle_delete_mode, []),
+        ButtonImageSprite(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/copybuttonsmall.png", toggle_copy_mode, []),
+        ButtonImageSprite(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/delbuttonsmall.png", toggle_delete_mode, []),
 
 
         splice,
