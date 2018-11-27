@@ -22,7 +22,7 @@ def load_buttons(game_state, splice_canvas):
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
     
-    helpbutton =ButtonImageSprite(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/helpbuttonsmall.png", dud, [])
+    helpbutton =ButtonImageSprite(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/helpbuttonsmall.png", toggle_tutorial, [])
     helpbutton.rect.centerx = (0.28 * x) - (((0.07 * x) - 70) / 2)
     workshop=ButtonSprite(0.25*x, 0.92*y, 'WORKSHOP', switch_to_workshop, [])
     workshop.rect.centerx = 0.28*x - ((0.07*x-70)/2)
@@ -65,6 +65,11 @@ def switch_to_workshop(game_state):
 def quit_game(game_state):
     game_state.update({'quit': True})
     game_state.update({'screen_done': True})
+    return game_state
+
+def toggle_tutorial(game_state):
+    tutorial = game_state.get('tutorial')
+    game_state.update({'tutorial': not tutorial})
     return game_state
 
 def dud(game_state): #holding function for buttons that don't do anything yet.
@@ -352,6 +357,9 @@ def splicer_loop(game_state):
         draw_rects(hover_rects1, game_surface, black, 2)
         draw_rects(hover_rects2, game_surface, red, 0)
         active_input.draw_input_box(game_state)
+
+        if game_state.get('tutorial') == True:
+            pygame.draw.rect(game_surface, (200,100, 200), (0.38*display_width, 0.08*display_height, 0.59*display_width, 0.84*display_height))
 
         toast_stack.draw(game_surface)
 
