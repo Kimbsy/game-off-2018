@@ -249,16 +249,19 @@ def splicer_loop(game_state):
     # Want to move these elsewhere/design them away.
     dragging = False
     dragged_sprite = None
+    selected = None
 
     while not game_state.get('screen_done'):
         if pygame.mouse.get_pos():
             s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
         else:
             s = None
+        if selected:
+            s= selected
 
         if s:
             hover_rects1 = [s.rect]
-            if s.deletable == True:
+            if s.selected == True:
                 hover_rects2 = [pygame.Rect(s.rect.x -2, s.rect.y-2 , 10, 10 ),
                                 pygame.Rect(s.rect.x + s.rect.w -8 , s.rect.y -2, 10, 10 ), 
                                 pygame.Rect(s.rect.x + s.rect.w -8, s.rect.y + s.rect.h -8, 10, 10 ),
@@ -282,6 +285,7 @@ def splicer_loop(game_state):
                     if s:
                         if game_state.get('delete_mode') == True:
                             splice_sprites.remove(s)
+
                         else:
                             dragging = True
                             dragged_sprite = s
@@ -294,6 +298,14 @@ def splicer_loop(game_state):
                 if b:
                     game_state.update({'new_sprite_name': active_input.text}) # TODO: this is a little hacky.
                     game_state = b.on_click(game_state)
+                if event.button == 3: #right click to select lock a sprite you are hovering on
+                    if s:
+                        if s.selected == False:
+                            s.toggle_selected()
+                            selected = s
+                        elif s.selected == True:
+                            s.toggle_selected()
+                            selected = None
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -310,12 +322,13 @@ def splicer_loop(game_state):
             elif active_input.active == False:
                 if event.type == pygame.KEYDOWN:
                     if s:
-                        if event.key == pygame.K_SPACE:
-                            s.toggle_deletable()
                         if event.key == pygame.K_LEFT:
                             s.rotate_counterclockwise()
                         if event.key == pygame.K_RIGHT:
                             s.rotate_clockwise()
+                        if event.key == pygame.K_DELETE:
+                            splice_sprites.remove(s)
+
 
         keys = pygame.key.get_pressed()
         if s:

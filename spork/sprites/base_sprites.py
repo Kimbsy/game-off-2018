@@ -79,7 +79,7 @@ class ImageSprite(BaseSprite):
         self.orig_height = size[1]
         self.aspect_scale= self.orig_width / self.orig_height
         self.scale = 100
-        self.deletable = False # object cannot initially be deleted
+        self.selected = False # allows object to be selected even when not hovered over
 
     def move(self, move):
         """Apply a translation the the position of this sprite's
@@ -128,12 +128,12 @@ class ImageSprite(BaseSprite):
         self.rect = self.image.get_rect()
         self.rect.center= loc
 
-    def toggle_deletable(self):
-        if self.deletable == False:
-            self.deletable = True
+    def toggle_selected(self):
+        if self.selected == False:
+            self.selected = True
             return
-        if self.deletable == True:
-            self.deletable =  False
+        if self.selected == True:
+            self.selected =  False
             return
 
 
