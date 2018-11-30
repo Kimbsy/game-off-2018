@@ -1,4 +1,4 @@
-import pygame, os, random, copy
+import pygame, os, random
 
 # Import helper functions.
 from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
