@@ -1,8 +1,9 @@
-import pygame, sys
+import pygame, sys, os
 from PIL import Image
+
 pygame.init()
 
-def displayImage(screen, px, topleft, prior):
+def displayImage(screen, px, topleft, prior, image_offset, crop_surface):
     # ensure that the rect always has positive width, height
     x, y = topleft
     width =  pygame.mouse.get_pos()[0] - topleft[0]
@@ -21,8 +22,14 @@ def displayImage(screen, px, topleft, prior):
     if current == prior:
         return current
 
+    #draw other objects on screen
+    pygame.draw.rect(screen, (255,255,255) , (0,0 , crop_surface[0], crop_surface[1]))
+    instruction_image = pygame.image.load(os.getcwd() + "/data/imgbase/mouseleft.png")
+    
+    screen.blit(instruction_image, (200 - (instruction_image.get_rect().w/2), 50))
+    screen.blit(px, image_offset)
+
     # draw transparent box and blit it onto canvas
-    screen.blit(px, px.get_rect())
     im = pygame.Surface((width, height))
     im.fill((128, 128, 128))
     pygame.draw.rect(im, (32, 32, 32), im.get_rect(), 1)
@@ -32,34 +39,49 @@ def displayImage(screen, px, topleft, prior):
 
     # return current box extents
     return (x, y, width, height)
-def setup(path):
-    px = pygame.image.load(path)
-    screen = pygame.display.set_mode( px.get_rect()[2:] )
-    screen.blit(px, px.get_rect())
-    pygame.display.flip()
-    return screen, px
+def setup(path, mirror = False):
+    crop_surface = (1200, 625)
+    image_offset = (500,50)
 
-def cropLoop(screen, px):
+    px = pygame.image.load(path)
+    
+    
+    screen = pygame.display.set_mode( (crop_surface) )
+
+    
+    pygame.draw.rect(screen, (255,255,255) , (0,0 , crop_surface[0], crop_surface[1]))
+    instruction_image = pygame.image.load(os.getcwd() + "/data/imgbase/mouseleft.png")
+    screen.blit(instruction_image, (200 - (instruction_image.get_rect().w/2), 50))
+    screen.blit(px, (image_offset))
+
+   
+    pygame.display.flip()
+    return screen, px ,crop_surface, image_offset
+
+def cropLoop(screen, px, crop_surface, image_offset, confirm_crop):
     topleft = bottomright = prior = None
     obj_rect = px.get_rect()
     n=0
     x=0
+    new_rect = pygame.Rect(0,0, crop_surface[0], crop_surface[1])
     while n!=1:
-        # if screen.get_rect().collidepoint(pygame.mouse.get_pos()) == True:
-        #     print("TRUE")
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                x=1
-            if x ==1:
-                if event.type == pygame.MOUSEBUTTONUP:
-                    if not topleft:
-                        topleft = event.pos
-                    else:
-                        bottomright = event.pos
-                        n=1
-        if topleft:
-            prior = displayImage(screen, px, topleft, prior)
-    return ( topleft + bottomright )
+        if new_rect.collidepoint(pygame.mouse.get_pos()) == True:
+              
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    x=1
+                if x ==1:
+                    if event.type == pygame.MOUSEBUTTONUP:
+                        if not topleft:
+                            topleft = event.pos
+                        else:
+                            bottomright = event.pos
+                            n=1
+                if topleft:
+                    prior = displayImage(screen, px, topleft, prior, image_offset, crop_surface)
+        if bottomright:
+            
+            return ( topleft + bottomright )
 
 if __name__ == "__main__":
     input_loc = 'u.png'

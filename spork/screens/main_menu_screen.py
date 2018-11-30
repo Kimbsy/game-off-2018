@@ -1,8 +1,8 @@
 import pygame, os, random, string
 
 # Import helper functions.
-from helpers import *
-
+from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
+from screenhelpers import quit_game, switch_to_screen, notify
 
 # Import sprites.
 from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point, TextSprite
@@ -43,7 +43,6 @@ def main_menu_loop(game_state):
     )
     company_name = game_state.get('company_name')
     input_font = pygame.font.Font(None, 50)
-    #input_width, input_height = input_font.render(company_name, True, (0, 0, 0)).get_size()
     input_width, input_height = 0.1* screen_width, 0.0625*screen_height
 
     company_name_input = InputBox(
@@ -97,6 +96,11 @@ def main_menu_loop(game_state):
                     game_state.update({'company_name': company_name_input.text}) # TODO: this is a little hacky.
                     click.play()
                     game_state = b.on_click(game_state)
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    game_state.update({'company_name': company_name_input.text})
+                    start_game(game_state)
     
             company_name_input.event_handle(event) #Input Box Class has inbuilt event handling function for key down events.
 

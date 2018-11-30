@@ -1,10 +1,13 @@
-import pygame, os, random
+import pygame, os, random, copy
 
 # Import helper functions.
-from helpers import *
+from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
+from screenhelpers import quit_game, switch_to_screen, notify
+
+#import crop module
 from crop import *
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point, ThumbnailSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point, ThumbnailSprite, ButtonImageSprite, ConfirmBox, TextSprite
 
 pygame.init()
 
@@ -16,43 +19,205 @@ dark_brown= (111,54,10)
 splice_sprites = pygame.sprite.OrderedUpdates()
 splice_thumbnails = pygame.sprite.Group()
 
-def load_buttons(game_state, splice_canvas):
+
+def load_buttons(game_state, splice_canvas, confirm_splice, confirm_crop):
 
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
+    
+    helpbutton =ButtonImageSprite(0.25*x, 0.8*y, os.getcwd() + "/data/imgbase/helpbuttonsmall.png", toggle_help, [])
+    helpbutton.rect.centerx = (0.28 * x) - (((0.07 * x) - 70) / 2)
+    workshop=ButtonSprite(0.25*x, 0.92*y, 'WORKSHOP', switch_to_workshop, [])
+    workshop.rect.centerx = 0.28*x - ((0.07*x-70)/2)
+    quit =ButtonSprite(0.25*x, 0.96*y, 'QUIT', quit_game, [])
+    quit.rect.centerx = 0.28*x - ((0.07*x-70)/2)
+
+    splice =ButtonImageSprite(0.05*x, 0.68*y, os.getcwd() + "/data/imgbase/" + "splicebuttonsmall.png", screenshot, [splice_canvas, confirm_splice])
+    splice.rect.centerx = 0.11*x
+
     splice_sprites.add(
-        ButtonSprite(0.05*x, 0.25*y, "add 1", add_1, []),
-        ButtonSprite(0.15*x, 0.25*y, "crop 1", crop, ["1"]),
-        ButtonSprite(0.05*x, 0.5*y, "add 2", add_2, []),
-        ButtonSprite(0.15*x, 0.5*y, "crop 2", crop, ["2"]),
-        ButtonSprite(0.1*x, 0.8*y, "SPLICE", screenshot, [splice_canvas]),
-        ButtonSprite(0.1*x, 0.85*y, 'Workshop!', switch_to_workshop, []),
-        ButtonSprite(0.1*x, 0.9*y, 'QUIT', quit_game, []),
+        ButtonImageSprite(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["1"]),
+        ButtonImageSprite(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["1", confirm_crop]),
+        ButtonImageSprite(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["1", True]),
+        ButtonImageSprite(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["1", confirm_crop, True] ),
+
+        ButtonImageSprite(0.21*x, 0.43*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["2"]),
+        ButtonImageSprite(0.28*x, 0.43*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["2", confirm_crop]),
+        ButtonImageSprite(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["2", True]),
+        ButtonImageSprite(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["2", confirm_crop, True]),
+
+        ButtonImageSprite(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/copybuttonsmall.png", toggle_copy_mode, []),
+        ButtonImageSprite(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/delbuttonsmall.png", toggle_delete_mode, []),
+
+        splice,
+        helpbutton,
+        workshop,
+        quit,      
     )
     return game_state
 
 def switch_to_workshop(game_state):
     game_state.update({'active_screen': 'workshop_screen'})
     game_state.update({'screen_done': True})
+    pygame.mouse.set_cursor(*pygame.cursors.arrow)
     return game_state
 
-def quit_game(game_state):
-    game_state.update({'quit': True})
-    game_state.update({'screen_done': True})
+def load_help_sprites(game_state):
+    thumbsize = 80
+    display_width = game_state.get('screen_size')[0]
+    display_height = game_state.get('screen_size')[1]
+    help_sprites = pygame.sprite.Group()
+
+    mleft = ThumbnailSprite(0.38*display_width, 0.08*display_height, os.getcwd() + "/data/imgbase/mouseleft.png", thumbsize, thumbsize)
+    mlefttxt = TextSprite(0.47*display_width, 0.12* display_height, 0.18*display_width, thumbsize, "Drag Object (Default) /n Delete / Copy")
+
+    mright = ThumbnailSprite(0.38*display_width, 0.22*display_height, os.getcwd() + "/data/imgbase/mouseright.png", thumbsize, thumbsize)
+    mrighttxt =TextSprite(0.47*display_width, 0.26* display_height, 0.18*display_width, thumbsize, "Lock Selected Object")
+
+    addthumb = ThumbnailSprite(0.38*display_width, 0.36*display_height, os.getcwd() + "/data/imgbase/addbuttonsmall.png", thumbsize, thumbsize)
+    addthumbtxt = TextSprite(0.47*display_width, 0.40*display_height, 0.18*display_width, thumbsize, "Add Object")
+
+    mirrorthumb = ThumbnailSprite(0.38*display_width, 0.50*display_height, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", thumbsize, thumbsize)
+    mirrorthumbtxt = TextSprite(0.47*display_width, 0.54*display_height, 0.18*display_width, thumbsize, "Add Mirror Image Object")
+
+    cropthumb = ThumbnailSprite(0.38*display_width, 0.64*display_height, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", thumbsize, thumbsize)
+    cropthumbtxt = TextSprite(0.47*display_width, 0.68*display_height, 0.18*display_width, thumbsize, "Add Cropped Object")
+
+    mirrorcropthumb = ThumbnailSprite(0.38*display_width, 0.78*display_height, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", thumbsize, thumbsize)
+    mirrorcropthumbtxt = TextSprite(0.47*display_width, 0.82*display_height, 0.18*display_width, thumbsize, "Add Mirror Image Cropped Object")
+
+    copythumb = ThumbnailSprite(0.69*display_width, 0.08*display_height, os.getcwd() + "/data/imgbase/copybuttonsmall.png", thumbsize, thumbsize)
+    copythumbtxt = TextSprite(0.78*display_width, 0.12*display_height, 0.18*display_width, thumbsize, "Toggle Copy Mode")
+
+    delthumb = ThumbnailSprite(0.69*display_width, 0.22*display_height, os.getcwd() + "/data/imgbase/delbuttonsmall.png", thumbsize, thumbsize)
+    delthumbtxt = TextSprite(0.78*display_width, 0.26*display_height, 0.18*display_width, thumbsize, "Toggle Delete Mode")
+
+    arrowup = ThumbnailSprite(0.69*display_width, 0.36*display_height, os.getcwd() + "/data/imgbase/arrow-up.png", thumbsize, thumbsize)
+    arrowuptxt = TextSprite(0.78*display_width, 0.40*display_height, 0.18*display_width, thumbsize, "Scale Up")
+
+    arrowdown = ThumbnailSprite(0.69*display_width, 0.5*display_height, os.getcwd() + "/data/imgbase/arrow-down.png", thumbsize, thumbsize)
+    arrowdowntxt = TextSprite(0.78*display_width, 0.54*display_height, 0.18*display_width, thumbsize, "Scale Down")
+
+    arrowleft = ThumbnailSprite(0.69*display_width, 0.64*display_height, os.getcwd() + "/data/imgbase/arrow-left.png", thumbsize, thumbsize)
+    arrowlefttxt = TextSprite(0.78*display_width, 0.68*display_height, 0.18*display_width, thumbsize, "Rotate AntiClockwise")
+
+    arrowright = ThumbnailSprite(0.69*display_width, 0.78*display_height, os.getcwd() + "/data/imgbase/arrow-right.png", thumbsize, thumbsize)
+    arrowrighttxt = TextSprite(0.78*display_width, 0.82*display_height, 0.18*display_width, thumbsize, "Rotate Clockwise")
+
+    help_sprites.add(mleft, mlefttxt,
+        mright, mrighttxt,
+        addthumb, addthumbtxt,
+        mirrorthumb, mirrorthumbtxt,
+        cropthumb, cropthumbtxt,
+        mirrorcropthumb, mirrorcropthumbtxt,
+        copythumb, copythumbtxt,
+        delthumb, delthumbtxt,
+        arrowup, arrowuptxt,
+        arrowdown, arrowdowntxt,
+        arrowleft, arrowlefttxt,
+        arrowright, arrowrighttxt
+        )
+
+    return help_sprites
+
+def open_help(game_state, help_sprites):
+    display_width = game_state.get('screen_size')[0]
+    display_height = game_state.get('screen_size')[1]
+    game_surface = game_state.get('game_surface')
+    pygame.draw.rect(game_surface, (200,100, 200), (0.365*display_width, 0.06*display_height, 0.605*display_width, 0.88*display_height))
+
+    help_sprites.draw(game_surface)
     return game_state
 
-def add_1(game_state):
-    splice_sprites.add(ImageSprite(490, 363, game_state.get('active_sprite1')))
+def toggle_help(game_state):
+    tutorial = game_state.get('tutorial')
+    game_state.update({'tutorial': not tutorial})
     return game_state
 
-def add_2(game_state):
-    splice_sprites.add(ImageSprite(390, 363, game_state.get('active_sprite2')))
+def dud(game_state): #holding function for buttons that don't do anything yet.
+    pass
     return game_state
 
-def screenshot(game_state, splice_canvas):
+def toggle_delete_mode(game_state):
+    delete_mode = game_state.get('delete_mode')
+    copy_mode = game_state.get('copy_mode')
+
+    if delete_mode == False:
+        game_state.update({'delete_mode': True})
+        game_state.update({'copy_mode': False})
+        pygame.mouse.set_cursor(*pygame.cursors.broken_x)
+        return game_state
+    if delete_mode == True:
+        game_state.update({'delete_mode': False})
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
+        return game_state
+
+    return game_state
+
+def toggle_copy_mode(game_state):
+    delete_mode = game_state.get('delete_mode')
+    copy_mode = game_state.get('copy_mode')
+    if copy_mode == False:
+        game_state.update({'copy_mode': True})
+        game_state.update({'delete_mode': False})
+        pygame.mouse.set_cursor(*pygame.cursors.diamond)
+        return game_state
+    if copy_mode == True:
+        game_state.update({'copy_mode': False})
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
+        return game_state
+
+    return game_state
+
+def add_sprite(game_state, num, mirror = False ):
+    x = game_state.get('screen_size')[0]
+    y = game_state.get('screen_size')[1]
+    locationx =0
+
+    if num == "1":
+        locationx = 0.5*x
+    elif num == "2":
+        locationx = 0.85*x
+    else:
+        return game_state
+    tempsprite = ImageSprite(locationx, 0.5*y, game_state.get('active_sprite' +num))
+    
+    if mirror == True:
+        tempsprite.image = pygame.transform.flip(tempsprite.image, True,False)
+        tempsprite.origimage = pygame.transform.flip(tempsprite.origimage, True, False)
+    if tempsprite.orig_width >= tempsprite.orig_height:
+        factor = 0.25*x/ tempsprite.orig_width
+    elif tempsprite.orig_width < tempsprite.orig_height:
+        factor = 0.5*y/ tempsprite.orig_height
+
+    tempsprite.scale = 100*factor
+
+    tempsprite.rect.center = (locationx, 0.5*y)
+    tempsprite.update_sprite()
+       
+    splice_sprites.add(tempsprite)
+    return game_state
+
+def screenshot(game_state, splice_canvas, confirm_splice):
+    
+    rect = splice_canvas
     new_name = game_state.get('new_sprite_name')
     if not new_name:
-        return notify(game_state, 'warn', 'Your sprite must have a name.')
+        return notify(game_state, 'warn', 'Your invention must have a name.')
+
+    #opens confirmation box allowing user to proceed or cancel
+    confirm_splice.active = True
+    confirm_splice.event_handle(game_state)
+    
+    if confirm_splice.proceed != True:
+        confirm_splice.proceed == None
+        confirm_splice.active = False
+        return notify(game_state, 'warn', 'You cancelled this splice.')
+    else:
+        confirm_splice.proceed == None
+        confirm_splice.active = False 
+
+
 
     # Choose a sellotape sound and begin playing it.
     sound_file = random.choice([
@@ -65,7 +230,7 @@ def screenshot(game_state, splice_canvas):
     
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
-    rect = splice_canvas
+    
 
     transparent_surface = pygame.Surface((display_width, display_height), pygame.SRCALPHA, 32)
     splice_sprites.draw(transparent_surface)
@@ -86,26 +251,40 @@ def screenshot(game_state, splice_canvas):
     # Wait for sellotape sound to finish.
     while channel.get_busy():
         pass
+    pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
     return switch_to_screen(game_state, 'result_screen')
 
-def crop(game_state, num):
-    screen, px = setup(game_state.get('active_sprite' + num))
-    left, upper, right, lower = cropLoop(screen, px)
+def crop(game_state, num, confirm_crop, mirror = False):
+    screen, px, crop_surface, image_offset = setup(game_state.get('active_sprite' + num), mirror)
+
+
+    left, upper, right, lower = cropLoop(screen, px, crop_surface, image_offset, confirm_crop)
 
     if right < left:
         left, right = right, left
     if lower < upper:
         lower, upper = upper, lower
 
+    confirm_crop.active = True
+    confirm_crop.event_handle(game_state)
+    
+    if confirm_crop.proceed != True:
+        confirm_crop.proceed == None
+        confirm_crop.active = False
+        return notify(game_state, 'warn', 'You cancelled this crop operation.')
+    else:
+        confirm_crop.proceed == None
+        confirm_crop.active = False
+
     im = Image.open(game_state.get('active_sprite'+ num))
-    im = im.crop(( left, upper, right, lower))
+    im = im.crop(( left-int(image_offset[0]), upper-int(image_offset[1]), right-int(image_offset[0]), lower-int(image_offset[1])))
     im.save('outie.png')
     display_width = 1200
     display_height = 675
     game_state.update({'game_surface': pygame.display.set_mode((display_width, display_height))})
     crop_sprite = (ImageSprite(490, 263, os.getcwd()+ '/outie.png'))
-    game_state.update({'crop_sprite' : crop_sprite})
+    splice_sprites.add(crop_sprite)
 
     return game_state
 
@@ -124,6 +303,8 @@ def splicer_loop(game_state):
     thumbnail_size = [0.2*display_width, 0.2*display_height]
     hover_rects1= []
     hover_rects2 = []
+    game_state.update({'delete_mode': False })
+    game_state.update({'copy_mode': False})
 
     splice_canvas = pygame.Rect(0.35*display_width, 0.035*display_height, 0.635* display_width, 0.93*display_height) #set splice canvas area that is captured by screenshot.
     
@@ -142,32 +323,45 @@ def splicer_loop(game_state):
         )
     # make the input box
 
-    count = 0 # need to design this out. This is to do with making cropped sprites.
+    confirm_splice = ConfirmBox( display_width/2, display_height/2 , "Confirm Splice")
+    confirm_crop = ConfirmBox( display_width/6, (display_height*3)/4 , "Confirm Crop")
+    
+    #generate all confirmation boxes that could be spawned by this screen
 
     toast_stack = game_state.get('toast_stack')
 
     splice_sprites.empty()
     splice_thumbnails.empty()
-    splice_thumbnails.add(ThumbnailSprite(0.175*display_width - (thumbnail_size[0]/4), 0.3*display_height, active_sprite1, thumbnail_size[0], thumbnail_size[1] ))
-    splice_thumbnails.add(ThumbnailSprite(0.175*display_width - (thumbnail_size[0]/4) , 0.55*display_height, active_sprite2,  thumbnail_size[0], thumbnail_size[1]))
+    thumb1 = ThumbnailSprite(0.1*display_width, 0.2*display_height, active_sprite1, thumbnail_size[0], thumbnail_size[1] )
+    thumb1.rect.centerx = 0.1*display_width
+    thumb2 = ThumbnailSprite(0.1*display_width, 0.45*display_height, active_sprite2,  thumbnail_size[0], thumbnail_size[1])
+    thumb2.rect.centerx = 0.1*display_width
+    splice_thumbnails.add(thumb1, thumb2)
 
     #make the thumbnails of your activesprites
 
-    load_buttons(game_state, splice_canvas)
+    help_sprites = load_help_sprites(game_state)
+    
+    #make sprites for the help pop-up
+
+    load_buttons(game_state, splice_canvas, confirm_splice, confirm_crop)
     
     # Want to move these elsewhere/design them away.
     dragging = False
     dragged_sprite = None
+    selected = None
 
     while not game_state.get('screen_done'):
         if pygame.mouse.get_pos():
             s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
         else:
             s = None
+        if selected:
+            s= selected
 
         if s:
             hover_rects1 = [s.rect]
-            if s.deletable == True:
+            if s.selected == True:
                 hover_rects2 = [pygame.Rect(s.rect.x -2, s.rect.y-2 , 10, 10 ),
                                 pygame.Rect(s.rect.x + s.rect.w -8 , s.rect.y -2, 10, 10 ), 
                                 pygame.Rect(s.rect.x + s.rect.w -8, s.rect.y + s.rect.h -8, 10, 10 ),
@@ -189,8 +383,25 @@ def splicer_loop(game_state):
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:    
                     if s:
-                        if s.deletable == True:
+                        if game_state.get('delete_mode') == True:
                             splice_sprites.remove(s)
+
+                        elif game_state.get('copy_mode') == True:
+                            copied_image = copy.copy(s) #deepcopy does not work for some reason so have to use copy!
+
+                            copied_image.rect = copied_image.image.get_rect()
+                            copied_image.rect.x = 0.375*display_width
+                            copied_image.rect.y = 0.1*display_height
+
+
+                            splice_sprites.add(copied_image)
+                            
+                            
+                            s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
+                           
+                            #s.update_sprite()
+                            
+
                         else:
                             dragging = True
                             dragged_sprite = s
@@ -198,15 +409,21 @@ def splicer_loop(game_state):
                             splice_sprites.add(s)
                     if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
                         active_input.toggle_active()
-
-                if event.button == 3:
-                    if s:
-                        s.rotate_clockwise() # actually rotates 45 right now.
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
                     game_state.update({'new_sprite_name': active_input.text}) # TODO: this is a little hacky.
                     game_state = b.on_click(game_state)
+                if event.button == 3: #right click to select lock a sprite you are hovering on
+                    if s:
+                        if s.selected == False:
+                            s.toggle_selected()
+                            selected = s
+                        elif s.selected == True:
+                            s.toggle_selected()
+                            selected = None
+                
+
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -223,12 +440,13 @@ def splicer_loop(game_state):
             elif active_input.active == False:
                 if event.type == pygame.KEYDOWN:
                     if s:
-                        if event.key == pygame.K_SPACE:
-                            s.toggle_deletable()
                         if event.key == pygame.K_LEFT:
                             s.rotate_counterclockwise()
                         if event.key == pygame.K_RIGHT:
                             s.rotate_clockwise()
+                        if event.key == pygame.K_DELETE:
+                            splice_sprites.remove(s)
+
 
         keys = pygame.key.get_pressed()
         if s:
@@ -237,20 +455,28 @@ def splicer_loop(game_state):
             if keys[pygame.K_DOWN]:
                 s.scale_down()
 
-        if game_state.get('crop_sprite') != None and count ==0:
-            splice_sprites.add(game_state.get('crop_sprite'))
-
-        # Update.
+           # Update.
         toast_stack.update()
 
         # Display.
         game_surface.fill(dark_brown)
         pygame.draw.rect(game_surface, white, splice_canvas)
+        
+        pygame.draw.rect(game_surface, (51,25, 0), (0.005*display_width, 0.17*display_height, 0.34*display_width, 0.245*display_height))
+        pygame.draw.rect(game_surface, (51,25, 0), (0.005*display_width, 0.42*display_height,  0.34*display_width, 0.245*display_height))
         splice_thumbnails.draw(game_surface)
+
         splice_sprites.draw(game_surface)
         draw_rects(hover_rects1, game_surface, black, 2)
         draw_rects(hover_rects2, game_surface, red, 0)
         active_input.draw_input_box(game_state)
+
+        #confirm_splice.draw_confirm_box(game_state)
+
+        if game_state.get('tutorial') == True:
+            open_help(game_state, help_sprites)
+            
+            
 
         toast_stack.draw(game_surface)
 

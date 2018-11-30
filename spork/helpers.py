@@ -5,22 +5,6 @@ import pygame
 
 #from sprites.base_sprites import ButtonSprite
 
-def quit_game(game_state):
-    """Stops the current screen and sets the quit flag so the main loop
-    will exit.
-    """
-    game_state.update({'quit': True})
-    game_state.update({'screen_done': True})
-    pygame.mixer.music.stop()
-    return game_state
-
-def switch_to_screen(game_state, screen_name):
-    """Transition from the current screen to another.
-    """
-    game_state.update({'active_screen': screen_name})
-    game_state.update({'screen_done': True})
-    return game_state
-
 def top_draggable_sprite_at_point(sprites, pos):
     """Returns a sprite from the sprite gruop containing the mouse
     position which is draggable.
@@ -64,11 +48,3 @@ def aspect_scale(img, target):
 def draw_rects(rect_list, game_surface, colour, fill):
     for rect in rect_list:
         pygame.draw.rect(game_surface, colour , rect, fill)
-
-def notify(game_state, level, text):
-    toast_stack = game_state.get('toast_stack')
-    screen_size = game_state.get('screen_size')
-    w = screen_size[0] * 0.5
-    h = screen_size[1] * 0.1
-    toast_stack.push({'level': level, 'text': text})
-    return game_state

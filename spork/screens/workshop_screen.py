@@ -1,7 +1,8 @@
 import pygame, os
 
 # Import helper functions.
-from helpers import *
+from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
+from screenhelpers import quit_game, switch_to_screen, notify
 
 # Import sprites.
 from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point, ThumbnailSprite
@@ -53,6 +54,7 @@ def start_splicer(game_state):
         return switch_to_screen(game_state, 'splicer_screen')
 
     print ('You must have two items to splice')
+    game_state = notify(game_state, 'warn', 'You must have two items to splice')
     return game_state
 
 def scroll_up(game_state, surface):
@@ -146,11 +148,11 @@ def workshop_loop(game_state):
     general_sprites.add(ButtonSprite(50, screen_height*0.8 + 50, 'Down', scroll_down, [scroll_surface], screen_width*0.25))
 
     for item in items:
-            item_file = os.getcwd() + '/data/pixel-components/' + item
-            scrollable_sprites.add(ThumbnailSprite(x, y, item_file, 50, 50))
-            item_text = item[6:-4]
-            scrollable_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file], w = 150))
-            y += 75
+        item_file = os.getcwd() + '/data/pixel-components/' + item
+        scrollable_sprites.add(ThumbnailSprite(x, y, item_file, 50, 50))
+        item_text = item[6:-4]
+        scrollable_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file], w = 150))
+        y += 75
 
     frame_x = screen_width*0.3
     frame_y = screen_height*0.1
