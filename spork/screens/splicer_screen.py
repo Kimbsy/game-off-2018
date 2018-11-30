@@ -2,7 +2,7 @@ import pygame, os, random, copy
 
 # Import helper functions.
 from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
-from screenhelpers import quit_game, switch_to_screen, notify
+from screen_helpers import quit_game, switch_to_screen, notify
 
 #import crop module
 from crop import *
@@ -217,8 +217,6 @@ def screenshot(game_state, splice_canvas, confirm_splice):
         confirm_splice.proceed == None
         confirm_splice.active = False 
 
-
-
     # Choose a sellotape sound and begin playing it.
     sound_file = random.choice([
         'sellotape_001.wav',
@@ -230,7 +228,6 @@ def screenshot(game_state, splice_canvas, confirm_splice):
     
     display_width = game_state.get('screen_size')[0]
     display_height = game_state.get('screen_size')[1]
-    
 
     transparent_surface = pygame.Surface((display_width, display_height), pygame.SRCALPHA, 32)
     splice_sprites.draw(transparent_surface)
@@ -381,7 +378,8 @@ def splicer_loop(game_state):
                 quit_game(game_state)
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:    
+                if event.button == 1:
+                    s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
                     if s:
                         if game_state.get('delete_mode') == True:
                             splice_sprites.remove(s)
@@ -393,14 +391,9 @@ def splicer_loop(game_state):
                             copied_image.rect.x = 0.375*display_width
                             copied_image.rect.y = 0.1*display_height
 
-
                             splice_sprites.add(copied_image)
                             
-                            
-                            s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
-                           
                             #s.update_sprite()
-                            
 
                         else:
                             dragging = True
@@ -476,8 +469,6 @@ def splicer_loop(game_state):
         if game_state.get('tutorial') == True:
             open_help(game_state, help_sprites)
             
-            
-
         toast_stack.draw(game_surface)
 
         pygame.display.update()

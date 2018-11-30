@@ -6,7 +6,7 @@ import pygame
 #from sprites.base_sprites import ButtonSprite
 
 def top_draggable_sprite_at_point(sprites, pos):
-    """Returns a sprite from the sprite gruop containing the mouse
+    """Returns a sprite from the sprite group containing the mouse
     position which is draggable.
 
     Reverses the sprite list so it finds sprites which are 'on top'
