@@ -385,10 +385,7 @@ def splicer_loop(game_state):
                             splice_sprites.remove(s)
 
                         elif game_state.get('copy_mode') == True:
-                            copied_image = s.clone()
-                            copied_image.rect = copied_image.image.get_rect()
-                            copied_image.rect.x = 0.375*display_width
-                            copied_image.rect.y = 0.1*display_height
+                            copied_image = s.clone(offset=(20, 20))
 
                             splice_sprites.add(copied_image)
                             

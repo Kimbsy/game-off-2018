@@ -80,10 +80,13 @@ class ImageSprite(BaseSprite):
         self.scale = 100
         self.selected = False # allows object to be selected even when not hovered over
 
-    def clone(self):
-        clone = ImageSprite(self.x, self.y, self.img_name)
+    def clone(self, offset=(0, 0)):
+        x_offset, y_offset = offset
+        clone = ImageSprite(self.x + x_offset, self.y + y_offset, self.img_name)
         clone.image = self.image
-        clone.rect = self.rect
+        clone.rect = self.image.get_rect()
+        clone.rect.x = self.rect.x + x_offset
+        clone.rect.y = self.rect.y + y_offset
         clone.rotation = self.rotation
         clone.scale = self.scale
         return clone
