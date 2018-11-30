@@ -80,6 +80,14 @@ class ImageSprite(BaseSprite):
         self.scale = 100
         self.selected = False # allows object to be selected even when not hovered over
 
+    def clone(self):
+        clone = ImageSprite(self.x, self.y, self.img_name)
+        clone.image = self.image
+        clone.rect = self.rect
+        clone.rotation = self.rotation
+        clone.scale = self.scale
+        return clone
+
     def move(self, move):
         """Apply a translation the the position of this sprite's
         rect based on a mousemotion relative movement.
@@ -523,4 +531,3 @@ class ConfirmBox(object):
                                 b.on_click(game_state)
                                 n=1
                                 return game_state
-                                
