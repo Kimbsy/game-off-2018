@@ -17,7 +17,8 @@ red = (255,0 ,0, 0)
 brown = (139,69,19)
 dark_brown= (111,54,10)
 splice_sprites = pygame.sprite.OrderedUpdates()
-splice_thumbnails = pygame.sprite.Group()
+splice_thumb1 = pygame.sprite.Group()
+splice_thumb2 = pygame.sprite.Group()
 
 
 def load_buttons(game_state, splice_canvas, confirm_splice, confirm_crop):
@@ -169,7 +170,7 @@ def toggle_copy_mode(game_state):
 
     return game_state
 
-def add_sprite(game_state, num, mirror = False ):
+def add_sprite(game_state, num, mirror = False):
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
     locationx =0
@@ -328,12 +329,14 @@ def splicer_loop(game_state):
     toast_stack = game_state.get('toast_stack')
 
     splice_sprites.empty()
-    splice_thumbnails.empty()
+    splice_thumb1.empty()
+    splice_thumb2.empty()
     thumb1 = ThumbnailSprite(0.1*display_width, 0.2*display_height, active_sprite1, thumbnail_size[0], thumbnail_size[1] )
     thumb1.rect.centerx = 0.1*display_width
     thumb2 = ThumbnailSprite(0.1*display_width, 0.45*display_height, active_sprite2,  thumbnail_size[0], thumbnail_size[1])
     thumb2.rect.centerx = 0.1*display_width
-    splice_thumbnails.add(thumb1, thumb2)
+    splice_thumb1.add(thumb1)
+    splice_thumb2.add(thumb2)
 
     #make the thumbnails of your activesprites
 
@@ -379,25 +382,33 @@ def splicer_loop(game_state):
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
-                    if s:
-                        if game_state.get('delete_mode') == True:
-                            splice_sprites.remove(s)
 
-                        elif game_state.get('copy_mode') == True:
-                            copied_image = s.clone(offset=(20, 20))
+                    # Hacky, but the expectation here is real
+                    if splice_thumb1.sprites()[0].rect.collidepoint(pygame.mouse.get_pos()):
+                            game_state = add_sprite(game_state, "1")
+                    elif splice_thumb2.sprites()[0].rect.collidepoint(pygame.mouse.get_pos()):
+                            game_state = add_sprite(game_state, "2")
 
-                            splice_sprites.add(copied_image)
-                            
-                            #s.update_sprite()
+                    else:
+                        s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
+                        if s:
+                            if game_state.get('delete_mode') == True:
+                                splice_sprites.remove(s)
 
-                        else:
-                            dragging = True
-                            dragged_sprite = s
-                            splice_sprites.remove(s)
-                            splice_sprites.add(s)
-                    if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
-                        active_input.toggle_active()
+                            elif game_state.get('copy_mode') == True:
+                                copied_image = s.clone(offset=(20, 20))
+
+                                splice_sprites.add(copied_image)
+
+                                #s.update_sprite()
+
+                            else:
+                                dragging = True
+                                dragged_sprite = s
+                                splice_sprites.remove(s)
+                                splice_sprites.add(s)
+                        if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
+                            active_input.toggle_active()
                 
                 b = button_at_point(splice_sprites, event.pos)
                 if b:
@@ -453,7 +464,8 @@ def splicer_loop(game_state):
         
         pygame.draw.rect(game_surface, (51,25, 0), (0.005*display_width, 0.17*display_height, 0.34*display_width, 0.245*display_height))
         pygame.draw.rect(game_surface, (51,25, 0), (0.005*display_width, 0.42*display_height,  0.34*display_width, 0.245*display_height))
-        splice_thumbnails.draw(game_surface)
+        splice_thumb1.draw(game_surface)
+        splice_thumb2.draw(game_surface)
 
         splice_sprites.draw(game_surface)
         draw_rects(hover_rects1, game_surface, black, 2)
