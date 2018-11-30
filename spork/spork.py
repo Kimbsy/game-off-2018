@@ -43,6 +43,7 @@ game_state = {
     'music_done': True,
     'delete_mode': False,
     'copy_mode': False,
+    'tutorial': False,
 }
 
 done = False
