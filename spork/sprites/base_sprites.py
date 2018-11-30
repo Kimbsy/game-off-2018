@@ -2,7 +2,7 @@ import pygame, os
 import math
 
 # Import helper functions.
-from helpers import *
+from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
 
 def button_at_point(sprites, pos):
     """Returns a sprite from the sprite group containing the mouse
@@ -15,7 +15,6 @@ def button_at_point(sprites, pos):
             return sprite
         elif (type(sprite) is ButtonImageSprite) and sprite.rect.collidepoint(pos):
             return sprite
-
 
 class BaseSprite(pygame.sprite.Sprite):
     """The base sprite class contains useful common functionality.
@@ -459,3 +458,69 @@ class InputBox(object):
         if event.type == pygame.KEYDOWN:
             self.add_character(event.unicode)
             return
+class ConfirmBox(object):
+    """Input Boxes can be easily generated and managed as a single class.
+    """
+
+    def __init__(self, center_x, center_y, message, alt_surface = None, width = 350, height = 190, box_colour = (25,25,220) , message_colour = (230,150,100)):
+             
+        self.center_x = center_x
+        self.center_y = center_y
+        self.message = message
+        self.rect = pygame.Rect(center_x - (width/2), center_y-(height/2), width, height)
+        self.box_colour = box_colour
+        self.message_colour = message_colour
+        self.font = pygame.font.Font(None, 50)
+        self.txt_surface = self.font.render (self.message, True, self.message_colour)
+        self.active = False
+        self.proceed = None
+        self.alt_surface = alt_surface
+
+        self.buttons = pygame.sprite.Group()
+        self.yes = ButtonImageSprite(center_x-100, center_y, os.getcwd() + "/data/imgbase/tickbuttonsmall.png", self.confirm, [])
+        self.no = ButtonImageSprite(center_x+30, center_y, os.getcwd() + "/data/imgbase/delbuttonsmall.png", self.cancel, [])
+        self.buttons.add(self.yes, self.no)
+        
+       
+    def confirm(self, game_state):
+        self.proceed = True
+
+    def cancel(self, game_state):
+        self.proceed = False
+
+    def toggle_active(self):
+        if self.active == False:
+            self.active = True
+            return
+        if self.active == True:
+            self.active =  False
+            return
+
+    def draw_confirm_box(self, game_state):
+        if self.active == True:
+            if self.alt_surface:
+                game_surface = alt_surface
+            else:
+                game_surface = game_state.get('game_surface')
+            pygame.draw.rect(game_surface, self.box_colour, self.rect)
+            game_surface.blit(self.txt_surface, (self.center_x+5 - (self.txt_surface.get_width()/2), self.rect.y+20))
+            self.buttons.draw(game_surface)
+        
+        return game_state        
+
+    def event_handle(self, game_state):
+        
+        if self.active == True:
+            self.draw_confirm_box(game_state)
+            pygame.display.update()
+            n=0
+            while n !=1:
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        b = button_at_point(self.buttons, event.pos)
+                        if b:
+                            if event.button == 1:
+                                b.on_click(game_state)
+                                n=1
+                                return game_state
+                                
