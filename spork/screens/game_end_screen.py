@@ -58,7 +58,9 @@ def game_end_loop(game_state):
         pic_frame_x += screen_width*0.25
         i += 1
 
-    for keepsake in built_sprites:
+    for keepsake_entry in built_sprites:
+        keepsake = keepsake_entry.get('sprite')
+        keepsake_name = keepsake_entry.get('name')
         keepsake.rect.x = frame_x
         keepsake.rect.y = frame_y
         frame_sprites.add(keepsake)

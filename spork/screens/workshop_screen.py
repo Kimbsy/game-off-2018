@@ -5,7 +5,7 @@ from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
 from screenhelpers import quit_game, switch_to_screen, notify
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point, ThumbnailSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point, ThumbnailSprite, TextSprite, ButtonImageSprite
 
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
@@ -102,7 +102,7 @@ def workshop_loop(game_state):
     """The workshop screen loop.
     """
     built_sprites = game_state.get('built_sprites')
-    if len(built_sprites) > 0: # should be > 2
+    if len(built_sprites) > 2: # should be > 2
         #add a button to the workbench that says go to the world fair! which calls the function below
         game_state = end_game(game_state)
         return game_state
@@ -124,6 +124,7 @@ def workshop_loop(game_state):
 
     toast_stack = game_state.get('toast_stack')
     available_funds = game_state.get('available_funds')
+    company = game_state.get('company_name')
 
     held_down = False
 
@@ -133,6 +134,8 @@ def workshop_loop(game_state):
 
     background_image = ImageSprite(0, 0, os.getcwd() + '/data/workshop.png')
     general_sprites.add(background_image)
+
+    general_sprites.add(TextSprite(screen_width*0.5, screen_height*0.01, screen_width*0.25, screen_height*0.2, company))
 
     general_sprites.add(
         ButtonSprite(screen_width*0.5, screen_height*0.5, 'Splice!', start_splicer, [], color=(255,0,0), text_color=(0,0,0)),
@@ -149,7 +152,8 @@ def workshop_loop(game_state):
 
     for item in items:
         item_file = os.getcwd() + '/data/pixel-components/' + item
-        scrollable_sprites.add(ThumbnailSprite(x, y, item_file, 50, 50))
+        scrollable_sprites.add(ButtonImageSprite(x, y, item_file, add_to_workbench, [item_file], w=50, h=50))
+        #ThumbnailSprite(x, y, item_file, 50, 50))
         item_text = item[6:-4]
         scrollable_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file], w = 150))
         y += 75
@@ -166,10 +170,16 @@ def workshop_loop(game_state):
         pic_frame_x += screen_width*0.25
         i += 1
 
-    for keepsake in built_sprites:
+
+    for keepsake_entry in built_sprites:
+        keepsake = keepsake_entry.get('sprite')
         keepsake.rect.x = frame_x
         keepsake.rect.y = frame_y
         general_sprites.add(keepsake)
+
+        keepsake_name = keepsake_entry.get('name')
+        general_sprites.add(TextSprite(frame_x, frame_y, screen_width*0.1, screen_height*0.05, keepsake_name))
+
         frame_x += screen_width*0.25
 
 

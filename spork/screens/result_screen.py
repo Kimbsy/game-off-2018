@@ -20,6 +20,14 @@ tagline_templates = [
     "Get your hands on the new {1}, now available from {0}.",
 
     "People in your local area are going crazy for {0}'s {1}.",
+
+    "Finally, the next new thng from {0}: the {1}!",
+
+    "Hot new talent from {0} brings us the {1} to brigten our lives.",
+
+    "The much anticipated {1} came out today, fresh from the creative heart of {0}.",
+
+    "The {1} made it's debut today, has {0} done it again?",
 ]
 
 review_templates = {
@@ -31,6 +39,12 @@ review_templates = {
             "I'll take 8!",
             "Perfect! An unmitigated sucess.",
             "This has the potential to be genuinely game changing.",
+            "How did any of us get along without it!",
+            "I've already ordered one for everyone in my family, I can't wait to see their faces!",
+            "A refreshing break from the status quo, they have captured the mood of the people.",
+            "Absolutely wonderful! Clearly a lot of love went into this.",
+            "A marvel of modern technology! Take that NASA.",
+            "Anyone who doesn't understand it, is an idiot.",
         ],
         'min_score': 8,
         'max_score': 10,
@@ -93,9 +107,10 @@ class NewspaperSprite(BaseSprite):
     """This sprite contains the reviews of the product.
     """
 
-    def __init__(self, x, y, w, h, company, product):
+    def __init__(self, x, y, img_path, w, h, company, product):
         self.x = x
         self.y = y
+        self.img_path = img_path
         self.w = w
         self.h = h
         self.done = False
@@ -111,11 +126,14 @@ class NewspaperSprite(BaseSprite):
         self.image = pygame.Surface((self.w, self.h))
         self.image.fill((150, 150, 150))
 
+        loaded_img = pygame.image.load(self.img_path)
+        self.image.blit(loaded_img, (0, 0))
+
         name = self.product.get('name')
 
         # Display the article title.
         title = self.font.render(name, True, self.text_color)
-        pos = ((self.w * 0.5) - (title.get_size()[0] * 0.5), (self.h * 0.075))
+        pos = ((self.w * 0.25) - (title.get_size()[0] * 0.5), (self.h * 0.2))
         self.image.blit(title, pos)
 
         # Generate a tagline.
@@ -130,13 +148,17 @@ class NewspaperSprite(BaseSprite):
         )
         self.image.blit(
             tagline_text_box.image,
-            ((self.w * 0.05), (self.h * 0.2))
+            ((self.w * 0.05), (self.h * 0.25))
         )
 
-        # Display the product image.
+        # Display the product image
         product_image = ImageSprite(0, 0, self.product.get('img'))
-        scaled_image = aspect_scale(product_image.image, ((self.w * 0.5), (self.h * 0.5)))
+        scaled_image = aspect_scale(product_image.image, ((self.w * 0.3), (self.h * 0.3)))
         self.image.blit(scaled_image, ((self.w * 0.65) , (self.h * 0.2)))
+        scaled_w, scaled_h = scaled_image.get_size()
+        box_rect = pygame.Rect((self.w * 0.65) , (self.h * 0.2), scaled_w, scaled_h)
+        pygame.draw.rect(self.image, (50,50,50), box_rect, 2)
+        print(scaled_w, scaled_h)
 
         # Choose a type of review
         # TODO: in future, make this based on the quality of the product.
@@ -252,6 +274,7 @@ def result_loop(game_state):
     company = game_state.get('company_name')
 
     toast_stack = game_state.get('toast_stack')
+    newspaper = os.getcwd() + '/data/imgbase/Newspaper.png'
 
     # Main group of sprites to display.
     all_sprites = pygame.sprite.OrderedUpdates()
@@ -262,6 +285,7 @@ def result_loop(game_state):
     newspaper = NewspaperSprite(
         x,
         y,
+        newspaper,
         w,
         h,
         company,
