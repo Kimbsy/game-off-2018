@@ -173,13 +173,13 @@ def workshop_loop(game_state):
         scrollable_sprites.add(ButtonSprite(x + 110, y + 40, item_text, add_to_workbench, [item_file], w = 100))
         y += 125
 
-    frame_x = screen_width*0.7
-    frame_y = screen_height*0.6
+    frame_x = screen_width-356
+    frame_y = screen_height-155
 
     for keepsake_entry in built_sprites:
         keepsake = keepsake_entry.get('sprite')
         keepsake.rect.x = frame_x
-        keepsake.rect.y = frame_y
+        keepsake.rect.y = frame_y - keepsake.rect.h
         general_sprites.add(keepsake)
 
         keepsake_name = keepsake_entry.get('name')
