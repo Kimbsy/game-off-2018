@@ -2,7 +2,7 @@ import pygame, os, random, string
 
 # Import helper functions.
 from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
-from screenhelpers import quit_game, switch_to_screen, notify
+from screen_helpers import quit_game, switch_to_screen, notify
 
 # Import sprites.
 from sprites.base_sprites import ImageSprite, ButtonSprite, InputBox, button_at_point, TextSprite
@@ -75,8 +75,6 @@ def main_menu_loop(game_state):
             quit_game,
             [],
         ),
-        
-
     )
     name_prompt = pygame.sprite.Group(
         TextSprite( (0.43*screen_width) , 0.65 *screen_height, 400, 30, "Enter Company Name", (255,255,255))
@@ -101,8 +99,8 @@ def main_menu_loop(game_state):
                 if event.key == pygame.K_RETURN:
                     game_state.update({'company_name': company_name_input.text})
                     start_game(game_state)
-    
-            company_name_input.event_handle(event) #Input Box Class has inbuilt event handling function for key down events.
+                else:
+                    company_name_input.event_handle(event) #Input Box Class has inbuilt event handling function for key down events.
 
         # Update.
         all_sprites.update()

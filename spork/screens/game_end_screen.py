@@ -2,7 +2,7 @@ import pygame, os
 
 # Import helper functions.
 from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
-from screenhelpers import quit_game, switch_to_screen, notify
+from screen_helpers import quit_game, switch_to_screen, notify
 
 # Import sprites.
 from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point, ThumbnailSprite
