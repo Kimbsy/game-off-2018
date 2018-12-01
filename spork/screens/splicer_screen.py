@@ -485,6 +485,12 @@ def splicer_loop(game_state):
         game_surface.fill(dark_brown)
         splice_thumb1.draw(game_surface)
         splice_thumb2.draw(game_surface)
+
+        if game_state.get('delete_mode') == True:
+            pygame.draw.rect(game_surface, (200,100, 200), ((0.28*display_width-2), (0.675*display_height -2), 74, 74))
+        elif game_state.get('copy_mode') == True:
+            pygame.draw.rect(game_surface, (200,100, 200), ((0.21*display_width-2), (0.675*display_height -2), 74, 74))
+
         control_sprites.draw(game_surface)
         
         # Only draw the splice sprites inside the splice canvas
@@ -500,6 +506,9 @@ def splicer_loop(game_state):
 
         if game_state.get('tutorial') == True:
             open_help(game_state, help_sprites)
+
+        
+            
             
         toast_stack.draw(game_surface)
 
