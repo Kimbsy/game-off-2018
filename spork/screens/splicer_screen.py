@@ -23,7 +23,6 @@ splice_thumb2 = pygame.sprite.Group()
 
 
 def load_buttons(game_state, splice_canvas, confirm_splice, confirm_crop):
-
     x = game_state.get('screen_size')[0]
     y = game_state.get('screen_size')[1]
     
