@@ -311,7 +311,7 @@ def splicer_loop(game_state):
         0.0625*display_height,
         0.2*display_height,
         0.0625*display_height,
-        pygame.font.Font(None, 50),
+        pygame.font.Font("ARCADECLASSIC.TTF", 40),
         (0,0,255),
         (255,255,0),
         0.175*display_width,

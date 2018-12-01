@@ -219,7 +219,7 @@ class TextSprite(BaseSprite):
         self.text = text
 
         # Define button text font.
-        self.font = pygame.font.SysFont(None, 25)
+        self.font = pygame.font.Font("ARCADECLASSIC.TTF", 40)
         self.text_color = text_color
         
         # Call the parent constructor.
