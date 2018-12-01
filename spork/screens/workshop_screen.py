@@ -136,7 +136,7 @@ def workshop_loop(game_state):
     scroll_surface = pygame.surface.Surface((screen_width*0.2, screen_height*0.8))#200,500
     scroll_rect = scroll_surface.get_rect(x=50, y=50)
 
-    background_image = ImageSprite(0, 0, os.getcwd() + '/data/workshop.png')
+    background_image = ImageSprite(0, 0, os.getcwd() + '/data/imgbase/workshop.png')
     general_sprites.add(background_image)
 
     general_sprites.add(TextSprite(screen_width*0.35, screen_height*0.3, screen_width*0.25, screen_height*0.2, company))
