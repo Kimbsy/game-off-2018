@@ -39,13 +39,13 @@ def load_buttons(game_state, splice_canvas, confirm_splice, confirm_crop):
     control_sprites.add(
         ButtonImageSprite(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["1"]),
         ButtonImageSprite(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["1", confirm_crop]),
-        ButtonImageSprite(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["1", True]),
-        ButtonImageSprite(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["1", confirm_crop, True] ),
+        ButtonImageSprite(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/flipbuttonsmall.png", add_sprite, ["1", True]),
+        #ButtonImageSprite(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["1", confirm_crop, True] ),
 
         ButtonImageSprite(0.21*x, 0.43*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["2"]),
         ButtonImageSprite(0.28*x, 0.43*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["2", confirm_crop]),
-        ButtonImageSprite(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["2", True]),
-        ButtonImageSprite(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["2", confirm_crop, True]),
+        ButtonImageSprite(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/flipbuttonsmall.png", add_sprite, ["2", True]),
+        #ButtonImageSprite(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["2", confirm_crop, True]),
 
         ButtonImageSprite(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/copybuttonsmall.png", toggle_copy_mode, []),
         ButtonImageSprite(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/delbuttonsmall.png", toggle_delete_mode, []),
@@ -81,7 +81,7 @@ def load_help_sprites(game_state):
     addthumbtxt = TextSprite(0.47*display_width, 0.40*display_height, 0.18*display_width, thumbsize, "Add Object")
     addthumbtxt.rect.centery = 0.40*display_height
 
-    mirrorthumb = ThumbnailSprite(0.38*display_width, 0.50*display_height, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", thumbsize, thumbsize)
+    mirrorthumb = ThumbnailSprite(0.38*display_width, 0.50*display_height, os.getcwd() + "/data/imgbase/flipbuttonsmall.png", thumbsize, thumbsize)
     mirrorthumbtxt = TextSprite(0.47*display_width, 0.54*display_height, 0.18*display_width, thumbsize, "Add Mirror Image Object")
     mirrorthumbtxt.rect.centery = 0.54*display_height
 
@@ -485,6 +485,12 @@ def splicer_loop(game_state):
         game_surface.fill(dark_brown)
         splice_thumb1.draw(game_surface)
         splice_thumb2.draw(game_surface)
+
+        if game_state.get('delete_mode') == True:
+            pygame.draw.rect(game_surface, (200,100, 200), ((0.28*display_width-2), (0.675*display_height -2), 74, 74))
+        elif game_state.get('copy_mode') == True:
+            pygame.draw.rect(game_surface, (200,100, 200), ((0.21*display_width-2), (0.675*display_height -2), 74, 74))
+
         control_sprites.draw(game_surface)
         
         # Only draw the splice sprites inside the splice canvas
@@ -500,6 +506,9 @@ def splicer_loop(game_state):
 
         if game_state.get('tutorial') == True:
             open_help(game_state, help_sprites)
+
+        
+            
             
         toast_stack.draw(game_surface)
 
