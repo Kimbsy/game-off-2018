@@ -70,40 +70,52 @@ def load_help_sprites(game_state):
     help_sprites = pygame.sprite.Group()
 
     mleft = ThumbnailSprite(0.38*display_width, 0.08*display_height, os.getcwd() + "/data/imgbase/mouseleft.png", thumbsize, thumbsize)
-    mlefttxt = TextSprite(0.47*display_width, 0.12* display_height, 0.18*display_width, thumbsize, "Drag Object (Default) /n Delete / Copy")
+    mlefttxt = TextSprite(0.47*display_width, 0.12* display_height, 0.18*display_width, thumbsize, "Drag Object (Default)/ Delete / Copy")
+    mlefttxt.rect.centery = 0.12*display_height
 
     mright = ThumbnailSprite(0.38*display_width, 0.22*display_height, os.getcwd() + "/data/imgbase/mouseright.png", thumbsize, thumbsize)
     mrighttxt =TextSprite(0.47*display_width, 0.26* display_height, 0.18*display_width, thumbsize, "Lock Selected Object")
+    mrighttxt.rect.centery = 0.26*display_height
 
     addthumb = ThumbnailSprite(0.38*display_width, 0.36*display_height, os.getcwd() + "/data/imgbase/addbuttonsmall.png", thumbsize, thumbsize)
     addthumbtxt = TextSprite(0.47*display_width, 0.40*display_height, 0.18*display_width, thumbsize, "Add Object")
+    addthumbtxt.rect.centery = 0.40*display_height
 
     mirrorthumb = ThumbnailSprite(0.38*display_width, 0.50*display_height, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", thumbsize, thumbsize)
     mirrorthumbtxt = TextSprite(0.47*display_width, 0.54*display_height, 0.18*display_width, thumbsize, "Add Mirror Image Object")
+    mirrorthumbtxt.rect.centery = 0.54*display_height
 
     cropthumb = ThumbnailSprite(0.38*display_width, 0.64*display_height, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", thumbsize, thumbsize)
     cropthumbtxt = TextSprite(0.47*display_width, 0.68*display_height, 0.18*display_width, thumbsize, "Add Cropped Object")
+    cropthumbtxt.rect.centery = 0.68*display_height
 
     mirrorcropthumb = ThumbnailSprite(0.38*display_width, 0.78*display_height, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", thumbsize, thumbsize)
     mirrorcropthumbtxt = TextSprite(0.47*display_width, 0.82*display_height, 0.18*display_width, thumbsize, "Add Mirror Image Cropped Object")
+    mirrorcropthumbtxt.rect.centery = 0.82*display_height
 
     copythumb = ThumbnailSprite(0.69*display_width, 0.08*display_height, os.getcwd() + "/data/imgbase/copybuttonsmall.png", thumbsize, thumbsize)
     copythumbtxt = TextSprite(0.78*display_width, 0.12*display_height, 0.18*display_width, thumbsize, "Toggle Copy Mode")
+    copythumbtxt.rect.centery = 0.12*display_height
 
     delthumb = ThumbnailSprite(0.69*display_width, 0.22*display_height, os.getcwd() + "/data/imgbase/delbuttonsmall.png", thumbsize, thumbsize)
     delthumbtxt = TextSprite(0.78*display_width, 0.26*display_height, 0.18*display_width, thumbsize, "Toggle Delete Mode")
+    delthumbtxt.rect.centery = 0.26*display_height
 
     arrowup = ThumbnailSprite(0.69*display_width, 0.36*display_height, os.getcwd() + "/data/imgbase/arrow-up.png", thumbsize, thumbsize)
     arrowuptxt = TextSprite(0.78*display_width, 0.40*display_height, 0.18*display_width, thumbsize, "Scale Up")
+    arrowuptxt.rect.centery = 0.4*display_height
 
     arrowdown = ThumbnailSprite(0.69*display_width, 0.5*display_height, os.getcwd() + "/data/imgbase/arrow-down.png", thumbsize, thumbsize)
     arrowdowntxt = TextSprite(0.78*display_width, 0.54*display_height, 0.18*display_width, thumbsize, "Scale Down")
+    arrowdowntxt.rect.centery = 0.54*display_height
 
     arrowleft = ThumbnailSprite(0.69*display_width, 0.64*display_height, os.getcwd() + "/data/imgbase/arrow-left.png", thumbsize, thumbsize)
     arrowlefttxt = TextSprite(0.78*display_width, 0.68*display_height, 0.18*display_width, thumbsize, "Rotate AntiClockwise")
+    arrowlefttxt.rect.centery = 0.68*display_height
 
     arrowright = ThumbnailSprite(0.69*display_width, 0.78*display_height, os.getcwd() + "/data/imgbase/arrow-right.png", thumbsize, thumbsize)
     arrowrighttxt = TextSprite(0.78*display_width, 0.82*display_height, 0.18*display_width, thumbsize, "Rotate Clockwise")
+    arrowrighttxt.rect.centery = 0.82*display_height
 
     help_sprites.add(mleft, mlefttxt,
         mright, mrighttxt,

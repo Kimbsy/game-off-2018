@@ -76,9 +76,11 @@ def main_menu_loop(game_state):
             [],
         ),
     )
-    name_prompt = pygame.sprite.Group(
-        TextSprite( (0.43*screen_width) , 0.65 *screen_height, 400, 30, "Enter Company Name", (255,255,255))
-        )
+
+    prompt = TextSprite( (0.43*screen_width) , 0.62 *screen_height, 400, 30, "Enter Company Name", (255,255,255))
+    prompt.rect.centerx = (screen_width/2)
+    name_prompt = pygame.sprite.Group()
+    name_prompt.add(prompt)
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
