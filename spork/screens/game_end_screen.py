@@ -5,7 +5,7 @@ from helpers import top_draggable_sprite_at_point, aspect_scale, draw_rects
 from screen_helpers import quit_game, switch_to_screen, notify
 
 # Import sprites.
-from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point, ThumbnailSprite
+from sprites.base_sprites import ImageSprite, ButtonSprite, button_at_point, ThumbnailSprite, TextSprite
 
 pygame.mixer.pre_init(22050, -16, 2, 1024)
 pygame.init()
@@ -17,11 +17,21 @@ pygame.mixer.init(22050, -16, 2, 1024)
 general_sprites = pygame.sprite.OrderedUpdates()
 frame_sprites = pygame.sprite.Group()
 background_sprite = pygame.sprite.Group()
+victory_screen_sprites = pygame.sprite.OrderedUpdates()
 
 def blimp_screen(game_state, sprite):
-    sprite.rect.x = 10
-    sprite.rect.y = 10
-    general_sprites.add(sprite)
+    sprite.rect.x = 300
+    sprite.rect.y = 255
+    victory_image = ImageSprite(0, 0, os.getcwd() + '/data/imgbase/blimp.png')
+    victory_screen_sprites.add(victory_image)
+    victory_screen_sprites.add(sprite)
+    victory_screen_sprites.add(TextSprite(100, 100, 500, 100, "Congratulations! You won!"))
+    victory_screen_sprites.add(TextSprite(35, 550, 500, 100, "You are a world renowned inventor!"))
+    victory_screen_sprites.add(TextSprite(700, 200, 500, 100, "Greatest of all time!"))
+    company = game_state.get('company_name')
+    victory_screen_sprites.add(TextSprite(570, 505, 500, 100, company))
+
+
 
     return game_state
 
@@ -41,22 +51,11 @@ def game_end_loop(game_state):
     toast_stack = game_state.get('toast_stack')
     available_funds = game_state.get('available_funds')
 
-    background_image = ImageSprite(0, 0, os.getcwd() + '/data/workshop.png')
-    background_sprite.add(background_image)
-
     general_sprites.add(ButtonSprite(screen_width*0.5, screen_height*0.05, 'QUIT', quit_game, []))
     
     frame_x = screen_width*0.2
-    frame_y = screen_height*0.1
-    pic_frame_x = frame_x - screen_width*0.01
-    pic_frame_y = frame_y - screen_width*0.01
-    i = 0
+    frame_y = screen_height*0.2
 
-    # Draw frames on the wall before adding images to them
-    while (i < 3):
-        general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
-        pic_frame_x += screen_width*0.25
-        i += 1
 
     for keepsake_entry in built_sprites:
         keepsake = keepsake_entry.get('sprite')
@@ -64,12 +63,13 @@ def game_end_loop(game_state):
         keepsake.rect.x = frame_x
         keepsake.rect.y = frame_y
         frame_sprites.add(keepsake)
+        general_sprites.add(TextSprite(frame_x, frame_y+200, 200, 200, keepsake_name))
         frame_x += screen_width*0.25
 
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
-
+        print(pygame.mouse.get_pos())
         # Handle events.
         hover_rect = None
         for sprite in frame_sprites:
@@ -96,8 +96,8 @@ def game_end_loop(game_state):
         toast_stack.update()
                 
         # Display.
-        game_surface.fill((255, 0, 0))
-        background_sprite.draw(game_surface)
+        game_surface.fill((150, 150, 150))
+        #background_sprite.draw(game_surface)
         general_sprites.draw(game_surface)
         frame_sprites.draw(game_surface)
         
@@ -110,6 +110,8 @@ def game_end_loop(game_state):
 
         if hover_rect:
             pygame.draw.rect(game_surface, (255,0,0), hover_rect, 5)
+
+        victory_screen_sprites.draw(game_surface)
 
         pygame.display.update()
 
