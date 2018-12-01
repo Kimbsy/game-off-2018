@@ -54,7 +54,8 @@ def main_menu_loop(game_state):
         (0, 0, 255),
         (255, 255, 0),
         center_x=0.5*screen_width,
-        text=company_name
+        text=company_name,
+        max_width=500
     )
     company_name_input.active = True
 

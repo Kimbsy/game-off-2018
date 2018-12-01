@@ -444,7 +444,6 @@ class InputBox(object):
             self.txt_surface = self.font.render (self.text, True, self.colour)
         self.adjust()    
 
-      
     def draw_input_box(self, game_state):
         fps = game_state.get('fps')
         game_surface = game_state.get('game_surface') 
@@ -460,7 +459,6 @@ class InputBox(object):
             if self.framecount >= fps:
                 self.framecount =1
         
-
     def toggle_active(self):
         if self.active == False:
             self.active = True
@@ -478,6 +476,7 @@ class InputBox(object):
         if event.type == pygame.KEYDOWN:
             self.add_character(event.unicode)
             return
+
 class ConfirmBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
