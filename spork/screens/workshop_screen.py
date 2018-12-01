@@ -138,7 +138,19 @@ def workshop_loop(game_state):
     background_image = ImageSprite(0, 0, os.getcwd() + '/data/imgbase/workshop.png')
     general_sprites.add(background_image)
 
-    general_sprites.add(TextSprite(screen_width*0.31, screen_height*0.32, screen_width*0.25, screen_height*0.2, company))
+    #little hacky
+    f = pygame.font.SysFont(None, 30)
+    rendered_company_name_width = f.render(company, True, (0,0,0)).get_size()[0]
+    print(rendered_company_name_width)
+    general_sprites.add(
+        TextSprite(
+            (screen_width * 0.31) + (250 * 0.5) - (rendered_company_name_width * 0.5),
+            screen_height*0.32,
+            rendered_company_name_width,
+            screen_height*0.2,
+            company
+        )
+    )
 
     general_sprites.add(
         ButtonSprite(screen_width * 0.8, screen_height * 0.05, 'QUIT', quit_game, []),
