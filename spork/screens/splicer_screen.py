@@ -17,6 +17,7 @@ red = (255,0 ,0, 0)
 brown = (139,69,19)
 dark_brown= (111,54,10)
 splice_sprites = pygame.sprite.OrderedUpdates()
+control_sprites = pygame.sprite.OrderedUpdates()
 splice_thumb1 = pygame.sprite.Group()
 splice_thumb2 = pygame.sprite.Group()
 
@@ -36,7 +37,7 @@ def load_buttons(game_state, splice_canvas, confirm_splice, confirm_crop):
     splice =ButtonImageSprite(0.05*x, 0.68*y, os.getcwd() + "/data/imgbase/" + "splicebuttonsmall.png", screenshot, [splice_canvas, confirm_splice])
     splice.rect.centerx = 0.11*x
 
-    splice_sprites.add(
+    control_sprites.add(
         ButtonImageSprite(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["1"]),
         ButtonImageSprite(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["1", confirm_crop]),
         ButtonImageSprite(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorbuttonsmall.png", add_sprite, ["1", True]),
@@ -171,37 +172,34 @@ def toggle_copy_mode(game_state):
     return game_state
 
 def add_sprite(game_state, num, mirror = False):
-    x = game_state.get('screen_size')[0]
-    y = game_state.get('screen_size')[1]
-    locationx =0
+    splice_canvas = game_state.get('splice_canvas')
+    screen_size = game_state.get('screen_size')
+    location_x = 0
 
     if num == "1":
-        locationx = 0.5*x
+        location_x = 0.4 * splice_canvas.w
     elif num == "2":
-        locationx = 0.85*x
+        location_x = 0.8 * splice_canvas.w
     else:
         return game_state
-    tempsprite = ImageSprite(locationx, 0.5*y, game_state.get('active_sprite' +num))
+    tempsprite = ImageSprite(location_x, (0.5 * splice_canvas.h), game_state.get('active_sprite' + num))
     
     if mirror == True:
-        tempsprite.image = pygame.transform.flip(tempsprite.image, True,False)
+        tempsprite.image = pygame.transform.flip(tempsprite.image, True, False)
         tempsprite.origimage = pygame.transform.flip(tempsprite.origimage, True, False)
-    if tempsprite.orig_width >= tempsprite.orig_height:
-        factor = 0.25*x/ tempsprite.orig_width
-    elif tempsprite.orig_width < tempsprite.orig_height:
-        factor = 0.5*y/ tempsprite.orig_height
 
-    tempsprite.scale = 100*factor
+    factor = 0.8 * splice_canvas.y / tempsprite.orig_height
 
-    tempsprite.rect.center = (locationx, 0.5*y)
+    tempsprite.scale = 1000 * factor
+
+    tempsprite.rect.center = (location_x, (0.5 * splice_canvas.h))
     tempsprite.update_sprite()
        
     splice_sprites.add(tempsprite)
     return game_state
 
 def screenshot(game_state, splice_canvas, confirm_splice):
-    
-    rect = splice_canvas
+
     new_name = game_state.get('new_sprite_name')
     if not new_name:
         return notify(game_state, 'warn', 'Your invention must have a name.')
@@ -231,12 +229,14 @@ def screenshot(game_state, splice_canvas, confirm_splice):
     display_height = game_state.get('screen_size')[1]
 
     transparent_surface = pygame.Surface((display_width, display_height), pygame.SRCALPHA, 32)
-    splice_sprites.draw(transparent_surface)
-    sub = transparent_surface.subsurface(rect)
+    splice_canvas_surface = pygame.Surface((splice_canvas.w, splice_canvas.h), pygame.SRCALPHA, 32)
+    splice_sprites.draw(splice_canvas_surface)
+    transparent_surface.blit(splice_canvas_surface, (splice_canvas.x, splice_canvas.y))
+    sub = transparent_surface.subsurface(splice_canvas)
 
     pygame.image.save(sub, os.getcwd() + "/data/temp/" + new_name + ".png")
     x = game_state.get('built_sprites')
-    x.add(ThumbnailSprite(1,1, os.getcwd() + "/data/temp/" + new_name + ".png", display_width*0.2, display_width*0.2))
+    x.add(ThumbnailSprite(1, 1, os.getcwd() + "/data/temp/" + new_name + ".png", display_width * 0.2, display_width * 0.2))
     game_state.update({'built_sprites' : x})
 
     game_state.update({'latest_product': {
@@ -286,6 +286,10 @@ def crop(game_state, num, confirm_crop, mirror = False):
 
     return game_state
 
+def get_relative_mouse_pos(pos):
+    x, y = pygame.mouse.get_pos()
+    return (x - pos[0], y - pos[1])
+
 def splicer_loop(game_state):
     """The splicer screen loop.
     """
@@ -305,7 +309,10 @@ def splicer_loop(game_state):
     game_state.update({'copy_mode': False})
 
     splice_canvas = pygame.Rect(0.35*display_width, 0.035*display_height, 0.635* display_width, 0.93*display_height) #set splice canvas area that is captured by screenshot.
+    splice_canvas_surface = pygame.Surface((splice_canvas.w, splice_canvas.h), pygame.SRCALPHA, 32)
+    game_state.update({'splice_canvas': splice_canvas})
     
+    # make the input box
     active_input = InputBox(
         0.05*display_width,
         0.0625*display_height,
@@ -318,8 +325,7 @@ def splicer_loop(game_state):
         '',
         0.25*display_width,
         0.33*display_width
-        )
-    # make the input box
+    )
 
     confirm_splice = ConfirmBox( display_width/2, display_height/2 , "Confirm Splice")
     confirm_crop = ConfirmBox( display_width/6, (display_height*3)/4 , "Confirm Crop")
@@ -353,7 +359,7 @@ def splicer_loop(game_state):
 
     while not game_state.get('screen_done'):
         if pygame.mouse.get_pos():
-            s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
+            s = top_draggable_sprite_at_point(splice_sprites, get_relative_mouse_pos((splice_canvas.x, splice_canvas.y)))
         else:
             s = None
         if selected:
@@ -362,11 +368,13 @@ def splicer_loop(game_state):
         if s:
             hover_rects1 = [s.rect]
             if s.selected == True:
-                hover_rects2 = [pygame.Rect(s.rect.x -2, s.rect.y-2 , 10, 10 ),
-                                pygame.Rect(s.rect.x + s.rect.w -8 , s.rect.y -2, 10, 10 ), 
-                                pygame.Rect(s.rect.x + s.rect.w -8, s.rect.y + s.rect.h -8, 10, 10 ),
-                                pygame.Rect(s.rect.x -2, s.rect.y + s.rect.h -8, 10, 10 )
-                                ]
+                r = s.rect
+                hover_rects2 = [
+                    pygame.Rect((r.x - 2), (r.y - 2), 10, 10),
+                    pygame.Rect((r.x + r.w - 8), (r.y - 2), 10, 10), 
+                    pygame.Rect((r.x + r.w - 8), (r.y + r.h - 8), 10, 10),
+                    pygame.Rect((r.x - 2), (r.y + r.h - 8), 10, 10)
+                ]
 
             else:
                 hover_rects2 = []
@@ -390,7 +398,7 @@ def splicer_loop(game_state):
                             game_state = add_sprite(game_state, "2")
 
                     else:
-                        s = top_draggable_sprite_at_point(splice_sprites, pygame.mouse.get_pos())
+                        s = top_draggable_sprite_at_point(splice_sprites, get_relative_mouse_pos((splice_canvas.x, splice_canvas.y)))
                         if s:
                             if game_state.get('delete_mode') == True:
                                 splice_sprites.remove(s)
@@ -410,20 +418,18 @@ def splicer_loop(game_state):
                         if active_input.rect.collidepoint(pygame.mouse.get_pos()) == True:
                             active_input.toggle_active()
                 
-                b = button_at_point(splice_sprites, event.pos)
-                if b:
-                    game_state.update({'new_sprite_name': active_input.text}) # TODO: this is a little hacky.
-                    game_state = b.on_click(game_state)
-                if event.button == 3: #right click to select lock a sprite you are hovering on
-                    if s:
-                        if s.selected == False:
-                            s.toggle_selected()
-                            selected = s
-                        elif s.selected == True:
-                            s.toggle_selected()
-                            selected = None
-                
-
+                    b = button_at_point(control_sprites, pygame.mouse.get_pos())
+                    if b:
+                        game_state.update({'new_sprite_name': active_input.text}) # TODO: this is a little hacky.
+                        game_state = b.on_click(game_state)
+                    if event.button == 3: #right click to select lock a sprite you are hovering on
+                        if s:
+                            if s.selected == False:
+                                s.toggle_selected()
+                                selected = s
+                            elif s.selected == True:
+                                s.toggle_selected()
+                                selected = None
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
@@ -455,21 +461,22 @@ def splicer_loop(game_state):
             if keys[pygame.K_DOWN]:
                 s.scale_down()
 
-           # Update.
+        # Update.
         toast_stack.update()
 
         # Display.
         game_surface.fill(dark_brown)
-        pygame.draw.rect(game_surface, white, splice_canvas)
-        
-        pygame.draw.rect(game_surface, (51,25, 0), (0.005*display_width, 0.17*display_height, 0.34*display_width, 0.245*display_height))
-        pygame.draw.rect(game_surface, (51,25, 0), (0.005*display_width, 0.42*display_height,  0.34*display_width, 0.245*display_height))
         splice_thumb1.draw(game_surface)
         splice_thumb2.draw(game_surface)
+        control_sprites.draw(game_surface)
+        
+        # Only draw the splice sprites inside the splice canvas
+        splice_canvas_surface.fill(white)
+        splice_sprites.draw(splice_canvas_surface)
+        draw_rects(hover_rects1, splice_canvas_surface, black, 2)
+        draw_rects(hover_rects2, splice_canvas_surface, red, 0)
+        game_surface.blit(splice_canvas_surface, (splice_canvas.x, splice_canvas.y))
 
-        splice_sprites.draw(game_surface)
-        draw_rects(hover_rects1, game_surface, black, 2)
-        draw_rects(hover_rects2, game_surface, red, 0)
         active_input.draw_input_box(game_state)
 
         #confirm_splice.draw_confirm_box(game_state)
