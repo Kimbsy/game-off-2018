@@ -39,7 +39,7 @@ def main_menu_loop(game_state):
             screen_height*0.15,
             os.getcwd() +"/data/imgbase/sporklogo1.png"
             )
-    logo.rect.center = (screen_width/2, screen_height/2)
+    logo.rect.centerx = (screen_width/2)
     logo_sprites.add(logo)
 
     company_name = game_state.get('company_name')

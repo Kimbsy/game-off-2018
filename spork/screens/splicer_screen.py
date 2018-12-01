@@ -40,12 +40,12 @@ def load_buttons(game_state, splice_canvas, confirm_splice, confirm_crop):
         ButtonImageSprite(0.21*x, 0.18*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["1"]),
         ButtonImageSprite(0.28*x, 0.18*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["1", confirm_crop]),
         ButtonImageSprite(0.21*x, 0.295*y, os.getcwd() + "/data/imgbase/flipbuttonsmall.png", add_sprite, ["1", True]),
-        ButtonImageSprite(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["1", confirm_crop, True] ),
+        #ButtonImageSprite(0.28*x, 0.295*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["1", confirm_crop, True] ),
 
         ButtonImageSprite(0.21*x, 0.43*y, os.getcwd() + "/data/imgbase/addbuttonsmall.png", add_sprite, ["2"]),
         ButtonImageSprite(0.28*x, 0.43*y, os.getcwd() + "/data/imgbase/cropbuttonsmall.png", crop, ["2", confirm_crop]),
         ButtonImageSprite(0.21*x, 0.545*y, os.getcwd() + "/data/imgbase/flipbuttonsmall.png", add_sprite, ["2", True]),
-        ButtonImageSprite(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["2", confirm_crop, True]),
+        #ButtonImageSprite(0.28*x, 0.545*y, os.getcwd() + "/data/imgbase/mirrorcropbuttonsmall.png", crop, ["2", confirm_crop, True]),
 
         ButtonImageSprite(0.21*x, 0.675*y, os.getcwd() + "/data/imgbase/copybuttonsmall.png", toggle_copy_mode, []),
         ButtonImageSprite(0.28*x, 0.675*y, os.getcwd() + "/data/imgbase/delbuttonsmall.png", toggle_delete_mode, []),
