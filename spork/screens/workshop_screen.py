@@ -22,12 +22,16 @@ def add_to_workbench(game_state, item_file):
 
     if not game_state.get('active_sprite1'):
         game_state.update({'active_sprite1': item_file})
-        left_sprite.add(ThumbnailSprite(screen_width*0.35, screen_height*0.55, item_file, screen_width*0.2, screen_width*0.2))
+        left = ThumbnailSprite(screen_width*0.275, screen_height*0.55, item_file, screen_width*0.2, screen_width*0.2)
+        left.rect.centerx = screen_width*0.275 + (left.w / 2)
+        left_sprite.add(left)
         general_sprites.add(left_remove_button)
 
     elif not game_state.get('active_sprite2'):
         game_state.update({'active_sprite2': item_file})
-        right_sprite.add(ThumbnailSprite(screen_width*0.65, screen_height*0.55, item_file, screen_width*0.2, screen_width*0.2))
+        right = ThumbnailSprite(screen_width*0.5, screen_height*0.55, item_file, screen_width*0.2, screen_width*0.2)
+        right.rect.centerx = screen_width*0.5 + (right.w / 2)
+        right_sprite.add(right)
         general_sprites.add(right_remove_button)
 
     else:
@@ -60,7 +64,7 @@ def start_splicer(game_state):
 def scroll_up(game_state, surface):
     #scrolls the item list up by moving scrollable_surface and sprites
     for sprite in scrollable_sprites:
-        if sprite.y > 2300:
+        if sprite.y > 3800:
             return game_state
 
     for sprite in scrollable_sprites:
@@ -73,7 +77,7 @@ def scroll_up(game_state, surface):
 
 def scroll_down(game_state, surface):
     for sprite in scrollable_sprites:
-        if sprite.y < -1800:
+        if sprite.y < -3200:
             return game_state
 
     for sprite in scrollable_sprites:
@@ -94,8 +98,8 @@ scrollable_sprites = pygame.sprite.Group()
 left_sprite = pygame.sprite.OrderedUpdates()
 right_sprite = pygame.sprite.OrderedUpdates()
 
-left_remove_button = ButtonSprite(350, 400, 'X', remove_workbench_item, ['left'])
-right_remove_button = ButtonSprite(700, 400, 'X', remove_workbench_item, ['right'])
+left_remove_button = ButtonSprite(300, 375, 'X', remove_workbench_item, ['left'], w=50) #350, 400
+right_remove_button = ButtonSprite(600, 375, 'X', remove_workbench_item, ['right'], w=50)
 
 
 def workshop_loop(game_state):
@@ -129,13 +133,13 @@ def workshop_loop(game_state):
     held_down = False
 
     #scroll_rect = pygame.Rect(0,0,200,500)
-    scroll_surface = pygame.surface.Surface((screen_width*0.25, screen_height*0.8))#200,500
+    scroll_surface = pygame.surface.Surface((screen_width*0.2, screen_height*0.8))#200,500
     scroll_rect = scroll_surface.get_rect(x=50, y=50)
 
     background_image = ImageSprite(0, 0, os.getcwd() + '/data/workshop.png')
     general_sprites.add(background_image)
 
-    general_sprites.add(TextSprite(screen_width*0.5, screen_height*0.01, screen_width*0.25, screen_height*0.2, company))
+    general_sprites.add(TextSprite(screen_width*0.35, screen_height*0.3, screen_width*0.25, screen_height*0.2, company))
 
     general_sprites.add(
         ButtonSprite(screen_width*0.5, screen_height*0.5, 'Splice!', start_splicer, [], color=(255,0,0), text_color=(0,0,0)),
@@ -147,28 +151,31 @@ def workshop_loop(game_state):
     x = 20
     y = 10
 
-    general_sprites.add(ButtonSprite(50, 50-20, 'Up', scroll_up, [scroll_surface], w = screen_width*0.25))
-    general_sprites.add(ButtonSprite(50, screen_height*0.8 + 50, 'Down', scroll_down, [scroll_surface], screen_width*0.25))
+    general_sprites.add(ButtonSprite(50, 50-20, 'Up', scroll_up, [scroll_surface], w = screen_width*0.2))
+    general_sprites.add(ButtonSprite(50, screen_height*0.8 + 50, 'Down', scroll_down, [scroll_surface], screen_width*0.2))
 
     for item in items:
         item_file = os.getcwd() + '/data/pixel-components/' + item
-        scrollable_sprites.add(ButtonImageSprite(x, y, item_file, add_to_workbench, [item_file], w=50, h=50))
+        temp_item = ButtonImageSprite(x, y, item_file, add_to_workbench, [item_file], w=100, h=100)
+        temp_item.rect.centerx = x + (temp_item.w / 2)
+        #temp_item.rect.centery = y + (temp_item.rect.y / 2)
+        scrollable_sprites.add(temp_item)
         #ThumbnailSprite(x, y, item_file, 50, 50))
         item_text = item[6:-4]
-        scrollable_sprites.add(ButtonSprite(x + 50, y, item_text, add_to_workbench, [item_file], w = 150))
-        y += 75
+        scrollable_sprites.add(ButtonSprite(x + 100, y, item_text, add_to_workbench, [item_file], w = 100))
+        y += 125
 
-    frame_x = screen_width*0.3
-    frame_y = screen_height*0.1
-    pic_frame_x = frame_x - screen_width*0.01
-    pic_frame_y = frame_y - screen_width*0.01
-    i = 0
+    frame_x = screen_width*0.7
+    frame_y = screen_height*0.6
+    # pic_frame_x = frame_x - screen_width*0.01
+    # pic_frame_y = frame_y - screen_width*0.01
+    # i = 0
 
     # Draw frames on the wall before adding images to them
-    while (i < 3):
-        general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
-        pic_frame_x += screen_width*0.25
-        i += 1
+    # while (i < 3):
+    #     general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
+    #     pic_frame_x += screen_width*0.25
+    #     i += 1
 
 
     for keepsake_entry in built_sprites:
@@ -180,7 +187,8 @@ def workshop_loop(game_state):
         keepsake_name = keepsake_entry.get('name')
         general_sprites.add(TextSprite(frame_x, frame_y, screen_width*0.1, screen_height*0.05, keepsake_name))
 
-        frame_x += screen_width*0.25
+        frame_x += screen_width*0.1
+        frame_y += screen_height*0.05
 
 
 
@@ -224,7 +232,7 @@ def workshop_loop(game_state):
                 
         # Display.
         game_surface.fill((255, 0, 0))
-        scroll_surface.fill((0,0,0))
+        scroll_surface.fill((200,200,200))
 
         general_sprites.draw(game_surface)
         scrollable_sprites.draw(scroll_surface)

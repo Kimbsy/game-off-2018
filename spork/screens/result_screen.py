@@ -117,6 +117,7 @@ class NewspaperSprite(BaseSprite):
         self.company = company
         self.product = product
         self.font = pygame.font.SysFont(None, 25)
+        self.title_font = pygame.font.SysFont(None, 40)
         self.text_color = (0, 0, 0)
 
         # Call the parent constructor
@@ -132,7 +133,7 @@ class NewspaperSprite(BaseSprite):
         name = self.product.get('name')
 
         # Display the article title.
-        title = self.font.render(name, True, self.text_color)
+        title = self.title_font.render(name, True, self.text_color)
         pos = ((self.w * 0.25) - (title.get_size()[0] * 0.5), (self.h * 0.2))
         self.image.blit(title, pos)
 
@@ -148,17 +149,16 @@ class NewspaperSprite(BaseSprite):
         )
         self.image.blit(
             tagline_text_box.image,
-            ((self.w * 0.05), (self.h * 0.25))
+            ((self.w * 0.05), (self.h * 0.3))
         )
 
         # Display the product image
         product_image = ImageSprite(0, 0, self.product.get('img'))
-        scaled_image = aspect_scale(product_image.image, ((self.w * 0.3), (self.h * 0.3)))
-        self.image.blit(scaled_image, ((self.w * 0.65) , (self.h * 0.2)))
+        scaled_image = aspect_scale(product_image.image, ((self.w * 0.4), (self.h * 0.4)))
+        self.image.blit(scaled_image, ((self.w * 0.65) , (self.h * 0.3)))
         scaled_w, scaled_h = scaled_image.get_size()
-        box_rect = pygame.Rect((self.w * 0.65) , (self.h * 0.2), scaled_w, scaled_h)
+        box_rect = pygame.Rect((self.w * 0.65) , (self.h * 0.3), scaled_w, scaled_h)
         pygame.draw.rect(self.image, (50,50,50), box_rect, 2)
-        print(scaled_w, scaled_h)
 
         # Choose a type of review
         # TODO: in future, make this based on the quality of the product.
@@ -168,7 +168,7 @@ class NewspaperSprite(BaseSprite):
         
         # Display the reviews with their scores.
         reviews = get_reviews(review_type)
-        y_offset = self.h * 0.4
+        y_offset = self.h * 0.45 
         for review in reviews:
             score = review.get('score')
             text = review.get('text') + '  ' + str(score) + '/10'
