@@ -94,6 +94,7 @@ def end_game(game_state):
 
 # Main group of sprites to display.
 general_sprites = pygame.sprite.OrderedUpdates()
+splice_button = pygame.sprite.OrderedUpdates()
 scrollable_sprites = pygame.sprite.Group()
 left_sprite = pygame.sprite.OrderedUpdates()
 right_sprite = pygame.sprite.OrderedUpdates()
@@ -131,23 +132,22 @@ def workshop_loop(game_state):
 
     held_down = False
 
-    #scroll_rect = pygame.Rect(0,0,200,500)
-    scroll_surface = pygame.surface.Surface((screen_width*0.2, screen_height*0.8))#200,500
+    scroll_surface = pygame.surface.Surface((screen_width*0.2, screen_height*0.8))
     scroll_rect = scroll_surface.get_rect(x=50, y=50)
 
     background_image = ImageSprite(0, 0, os.getcwd() + '/data/imgbase/workshop.png')
     general_sprites.add(background_image)
 
-    general_sprites.add(TextSprite(screen_width*0.35, screen_height*0.3, screen_width*0.25, screen_height*0.2, company))
+    general_sprites.add(TextSprite(screen_width*0.31, screen_height*0.32, screen_width*0.25, screen_height*0.2, company))
 
     general_sprites.add(
-        ButtonSprite(screen_width*0.5, screen_height*0.5, 'Splice!', start_splicer, [], color=(255,0,0), text_color=(0,0,0)),
-        ButtonSprite(screen_width*0.8, screen_height*0.05, 'QUIT', quit_game, []),
+        ButtonSprite(screen_width * 0.8, screen_height * 0.05, 'QUIT', quit_game, []),
     )
+    splice_button.add(ButtonSprite(screen_width * 0.4, screen_height * 0.5, 'Splice!', start_splicer, [], color=(0,255,0), text_color=(0,0,0)))
 
     items = os.listdir(os.getcwd() + '/data/pixel-components')
    
-    x = 20
+    x = 10
     y = 10
 
     general_sprites.add(ButtonSprite(50, 50-20, 'Up', scroll_up, [scroll_surface], w = screen_width*0.2))
@@ -159,12 +159,11 @@ def workshop_loop(game_state):
         temp_item.rect.centerx = x + (temp_item.w / 2)
         scrollable_sprites.add(temp_item)
         item_text = item[6:-4]
-        scrollable_sprites.add(ButtonSprite(x + 100, y, item_text, add_to_workbench, [item_file], w = 100))
+        scrollable_sprites.add(ButtonSprite(x + 110, y + 40, item_text, add_to_workbench, [item_file], w = 100))
         y += 125
 
     frame_x = screen_width*0.7
     frame_y = screen_height*0.6
-
 
     for keepsake_entry in built_sprites:
         keepsake = keepsake_entry.get('sprite')
@@ -211,8 +210,11 @@ def workshop_loop(game_state):
         # Needed to hold down up and down scroll buttons
         if held_down:
             b = button_at_point(general_sprites, pygame.mouse.get_pos())
+            b2 = button_at_point(splice_button, pygame.mouse.get_pos())
             if b:
                 game_state = b.on_click(game_state)
+            elif b2:
+                game_state = b2.on_click(game_state)
 
 
         # Update.
@@ -223,7 +225,22 @@ def workshop_loop(game_state):
         scroll_surface.fill((200,200,200))
 
         general_sprites.draw(game_surface)
-        scrollable_sprites.draw(scroll_surface)
+
+        # only draw splice button if both sprites present
+        if len(left_sprite.sprites()) and len(right_sprite.sprites()):
+            splice_button.draw(game_surface)
+        
+        # draw scrollable items (hacky, obvs)
+        offset = scrollable_sprites.sprites()[0].rect.y - 10
+        for i, s in enumerate(scrollable_sprites.sprites()):
+            bg = pygame.Surface((screen_width*0.2, 125))
+            if i % 2:
+                bg.fill((150,150,150))
+            else:
+                bg.fill((50,50,50))
+            scroll_surface.blit(bg, (0, (i * 125) + offset))
+            scroll_surface.blit(s.image, s.rect)
+
         left_sprite.draw(game_surface)
         right_sprite.draw(game_surface)
         toast_stack.draw(game_surface)
@@ -231,7 +248,7 @@ def workshop_loop(game_state):
         
         funds_string = "Lifetime earnings: £{0:.2f}".format(available_funds)
         rendered_text = pygame.font.SysFont(None, 25).render(funds_string, True, (0,0,0))
-        game_surface.blit(rendered_text, (800, 50))
+        game_surface.blit(rendered_text, (screen_width * 0.7, screen_height * 0.1))
 
         pygame.display.update()
 

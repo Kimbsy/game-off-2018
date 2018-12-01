@@ -219,13 +219,16 @@ class TextSprite(BaseSprite):
     """Displays text wrapping lines within the bounding rectangle.
     """
 
-    def __init__(self, x, y, w, h, text, text_color=(0, 0, 0)):
+    def __init__(self, x, y, w, h, text, text_color=(0, 0, 0), arcade_font=False):
         self.w = w
         self.h = h
         self.text = text
 
         # Define button text font.
-        self.font = pygame.font.Font("ARCADECLASSIC.TTF", 40)
+        if arcade_font:
+            self.font = pygame.font.Font("ARCADECLASSIC.TTF", 40)
+        else:
+            self.font = pygame.font.SysFont(None, 30)
         self.text_color = text_color
         
         # Call the parent constructor.
@@ -441,7 +444,6 @@ class InputBox(object):
             self.txt_surface = self.font.render (self.text, True, self.colour)
         self.adjust()    
 
-      
     def draw_input_box(self, game_state):
         fps = game_state.get('fps')
         game_surface = game_state.get('game_surface') 
@@ -457,7 +459,6 @@ class InputBox(object):
             if self.framecount >= fps:
                 self.framecount =1
         
-
     def toggle_active(self):
         if self.active == False:
             self.active = True
@@ -475,6 +476,7 @@ class InputBox(object):
         if event.type == pygame.KEYDOWN:
             self.add_character(event.unicode)
             return
+
 class ConfirmBox(object):
     """Input Boxes can be easily generated and managed as a single class.
     """
