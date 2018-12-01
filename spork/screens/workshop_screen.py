@@ -133,7 +133,7 @@ def workshop_loop(game_state):
 
     held_down = False
 
-    scroll_surface = pygame.surface.Surface((screen_width*0.2, screen_height*0.8))#200,500
+    scroll_surface = pygame.surface.Surface((screen_width*0.2, screen_height*0.8))
     scroll_rect = scroll_surface.get_rect(x=50, y=50)
 
     background_image = ImageSprite(0, 0, os.getcwd() + '/data/imgbase/workshop.png')
@@ -148,7 +148,7 @@ def workshop_loop(game_state):
 
     items = os.listdir(os.getcwd() + '/data/pixel-components')
    
-    x = 20
+    x = 10
     y = 10
 
     general_sprites.add(ButtonSprite(50, 50-20, 'Up', scroll_up, [scroll_surface], w = screen_width*0.2))
@@ -160,7 +160,7 @@ def workshop_loop(game_state):
         temp_item.rect.centerx = x + (temp_item.w / 2)
         scrollable_sprites.add(temp_item)
         item_text = item[6:-4]
-        scrollable_sprites.add(ButtonSprite(x + 100, y, item_text, add_to_workbench, [item_file], w = 100))
+        scrollable_sprites.add(ButtonSprite(x + 110, y + 40, item_text, add_to_workbench, [item_file], w = 100))
         y += 125
 
     frame_x = screen_width*0.7
@@ -231,7 +231,17 @@ def workshop_loop(game_state):
         if len(left_sprite.sprites()) and len(right_sprite.sprites()):
             splice_button.draw(game_surface)
         
-        scrollable_sprites.draw(scroll_surface)
+        # draw scrollable items (hacky, obvs)
+        offset = scrollable_sprites.sprites()[0].rect.y - 10
+        for i, s in enumerate(scrollable_sprites.sprites()):
+            bg = pygame.Surface((screen_width*0.2, 125))
+            if i % 2:
+                bg.fill((150,150,150))
+            else:
+                bg.fill((50,50,50))
+            scroll_surface.blit(bg, (0, (i * 125) + offset))
+            scroll_surface.blit(s.image, s.rect)
+
         left_sprite.draw(game_surface)
         right_sprite.draw(game_surface)
         toast_stack.draw(game_surface)
