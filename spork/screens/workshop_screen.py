@@ -95,7 +95,7 @@ def end_game(game_state):
 # Main group of sprites to display.
 general_sprites = pygame.sprite.OrderedUpdates()
 splice_button = pygame.sprite.OrderedUpdates()
-scrollable_sprites = pygame.sprite.Group()
+scrollable_sprites = pygame.sprite.OrderedUpdates()
 left_sprite = pygame.sprite.OrderedUpdates()
 right_sprite = pygame.sprite.OrderedUpdates()
 
@@ -153,7 +153,7 @@ def workshop_loop(game_state):
     general_sprites.add(ButtonSprite(50, 50-20, 'Up', scroll_up, [scroll_surface], w = screen_width*0.2))
     general_sprites.add(ButtonSprite(50, screen_height*0.8 + 50, 'Down', scroll_down, [scroll_surface], screen_width*0.2))
 
-    for item in items:
+    for item in sorted(items):
         item_file = os.getcwd() + '/data/pixel-components/' + item
         temp_item = ButtonImageSprite(x, y, item_file, add_to_workbench, [item_file], w=100, h=100)
         temp_item.rect.centerx = x + (temp_item.w / 2)
