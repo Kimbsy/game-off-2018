@@ -137,10 +137,6 @@ class ImageSprite(BaseSprite):
         self.image = aspect_scale( tempimage, (new_width, new_height))
         self.rect = self.image.get_rect()
         self.rect.center = loc
-        # self.rect.x = loc[0] - self.rect.w
-        # self.rect.y = loc[1] - self.rect.h
-        # self.x = self.rect.x
-        # self.y = self.rect.y
 
     def toggle_selected(self):
         if self.selected == False:
