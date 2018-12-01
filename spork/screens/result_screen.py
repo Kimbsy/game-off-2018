@@ -119,6 +119,7 @@ class NewspaperSprite(BaseSprite):
         self.font = pygame.font.SysFont(None, 25)
         self.title_font = pygame.font.SysFont(None, 40)
         self.text_color = (0, 0, 0)
+        self.review_type = None
 
         # Call the parent constructor
         super(NewspaperSprite, self).__init__(x, y)
@@ -161,10 +162,22 @@ class NewspaperSprite(BaseSprite):
         pygame.draw.rect(self.image, (50,50,50), box_rect, 2)
 
         # Choose a type of review
-        # TODO: in future, make this based on the quality of the product.
-        review_type = random.choice(list(review_templates.keys()))
+        # suuuper quick hacky way of percentage choices
+        choice_list = [
+            'good',
+            'good',
+            'good',
+            'medium',
+            'medium',
+            'medium',
+            'medium',
+            'medium',
+            'bad',
+        ]
+        review_type = random.choice(choice_list)
         if (random.random() < 0.05):
             review_type = 'very_bad'
+        self.review_type = review_type
         
         # Display the reviews with their scores.
         reviews = get_reviews(review_type)
@@ -256,8 +269,15 @@ class MoneySprite(BaseSprite):
         else:
             self.done = True
 
-def sell(product):
-    return round(random.uniform(1.0, 15.0), 2) # TODO: make this depend on the product.
+def sell(product, review_type):
+    if review_type == 'good':
+        return round(random.uniform(15.0, 20.0), 2)
+    elif review_type == 'medium':
+        return round(random.uniform(10.0, 15.0), 2)
+    elif review_type == 'bad':
+        return round(random.uniform(1.0, 6.0), 2)
+    elif review_type == 'very_bad':
+        return round(random.uniform(0.01, 3.0), 2)
 
 def result_loop(game_state):
     """The result screen loop.
@@ -295,7 +315,7 @@ def result_loop(game_state):
 
     # Money counter, gets added after newspaper is done.
     available_funds = game_state.get('available_funds')
-    profit = sell(product)
+    profit = sell(product, newspaper.review_type)
     game_state.update({'available_funds': available_funds + profit})
     money = MoneySprite(
         (screen_width * 0.5),
