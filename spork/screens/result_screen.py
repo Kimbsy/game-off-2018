@@ -162,8 +162,19 @@ class NewspaperSprite(BaseSprite):
         pygame.draw.rect(self.image, (50,50,50), box_rect, 2)
 
         # Choose a type of review
-        # TODO: in future, make this based on the quality of the product.
-        review_type = random.choice(list(review_templates.keys()))
+        # suuuper quick hacky way of percentage choices
+        choice_list = [
+            'good',
+            'good',
+            'good',
+            'medium',
+            'medium',
+            'medium',
+            'medium',
+            'medium',
+            'bad',
+        ]
+        review_type = random.choice(choice_list)
         if (random.random() < 0.05):
             review_type = 'very_bad'
         self.review_type = review_type
