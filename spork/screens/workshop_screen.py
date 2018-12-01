@@ -141,7 +141,6 @@ def workshop_loop(game_state):
     #little hacky
     f = pygame.font.SysFont(None, 30)
     rendered_company_name_width = f.render(company, True, (0,0,0)).get_size()[0]
-    print(rendered_company_name_width)
     general_sprites.add(
         TextSprite(
             (screen_width * 0.31) + (250 * 0.5) - (rendered_company_name_width * 0.5),
