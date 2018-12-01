@@ -185,12 +185,14 @@ class ButtonSprite(BaseSprite):
 class ButtonImageSprite(BaseSprite):
     "clickable image that performs a function"
 
-    def __init__(self,x ,y, img_path, f, args):
+    def __init__(self,x ,y, img_path, f, args, w=None, h=None):
         self.x = x
         self.y = y
         self.img_path = img_path
         self.f = f
         self.args = args
+        self.w = w
+        self.h = h
         
         super(ButtonImageSprite, self).__init__(x,y)
 
@@ -200,8 +202,12 @@ class ButtonImageSprite(BaseSprite):
 
         # Create a surface containing the image with a transparent
         # background.
+
         self.image = pygame.Surface(size, pygame.SRCALPHA, 32)
         self.image.blit(loaded_img, (0, 0))
+        if self.w:
+            self.image = aspect_scale(self.image, (self.w, self.h))
+
 
     def on_click(self, game_state):
         """Invoke the on_click function.
