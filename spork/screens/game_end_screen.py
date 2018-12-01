@@ -25,13 +25,11 @@ def blimp_screen(game_state, sprite):
     victory_image = ImageSprite(0, 0, os.getcwd() + '/data/imgbase/blimp.png')
     victory_screen_sprites.add(victory_image)
     victory_screen_sprites.add(sprite)
-    victory_screen_sprites.add(TextSprite(100, 100, 500, 100, "Congratulations! You won!"))
-    victory_screen_sprites.add(TextSprite(35, 550, 500, 100, "You are a world renowned inventor!"))
-    victory_screen_sprites.add(TextSprite(700, 200, 500, 100, "Greatest of all time!"))
+    victory_screen_sprites.add(TextSprite(100, 100, 500, 100, "Congratulations! You won!", arcade_font=True))
+    victory_screen_sprites.add(TextSprite(35, 550, 500, 100, "You are a world renowned inventor!", arcade_font=True))
+    victory_screen_sprites.add(TextSprite(700, 200, 500, 100, "Greatest of all time!", arcade_font=True))
     company = game_state.get('company_name')
     victory_screen_sprites.add(TextSprite(570, 505, 500, 100, company))
-
-
 
     return game_state
 
@@ -69,7 +67,6 @@ def game_end_loop(game_state):
 
     # Want to refactor this body into seperate functions.
     while not game_state.get('screen_done'):
-        print(pygame.mouse.get_pos())
         # Handle events.
         hover_rect = None
         for sprite in frame_sprites:
