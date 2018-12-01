@@ -17,11 +17,15 @@ pygame.mixer.init(22050, -16, 2, 1024)
 general_sprites = pygame.sprite.OrderedUpdates()
 frame_sprites = pygame.sprite.Group()
 background_sprite = pygame.sprite.Group()
+victory_screen_sprites = pygame.sprite.Group()
 
 def blimp_screen(game_state, sprite):
-    sprite.rect.x = 10
-    sprite.rect.y = 10
-    general_sprites.add(sprite)
+    #sprite.rect.x = 10
+    #sprite.rect.y = 10
+    victory_image = ImageSprite(0, 0, os.getcwd() + '/data/victory_image.jpg')
+    victory_screen_sprites.add(victory_image)
+    victory_screen_sprites.add(sprite)
+
 
     return game_state
 
@@ -48,15 +52,7 @@ def game_end_loop(game_state):
     
     frame_x = screen_width*0.2
     frame_y = screen_height*0.1
-    pic_frame_x = frame_x - screen_width*0.01
-    pic_frame_y = frame_y - screen_width*0.01
-    i = 0
 
-    # Draw frames on the wall before adding images to them
-    while (i < 3):
-        general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
-        pic_frame_x += screen_width*0.25
-        i += 1
 
     for keepsake_entry in built_sprites:
         keepsake = keepsake_entry.get('sprite')

@@ -158,24 +158,13 @@ def workshop_loop(game_state):
         item_file = os.getcwd() + '/data/pixel-components/' + item
         temp_item = ButtonImageSprite(x, y, item_file, add_to_workbench, [item_file], w=100, h=100)
         temp_item.rect.centerx = x + (temp_item.w / 2)
-        #temp_item.rect.centery = y + (temp_item.rect.y / 2)
         scrollable_sprites.add(temp_item)
-        #ThumbnailSprite(x, y, item_file, 50, 50))
         item_text = item[6:-4]
         scrollable_sprites.add(ButtonSprite(x + 100, y, item_text, add_to_workbench, [item_file], w = 100))
         y += 125
 
     frame_x = screen_width*0.7
     frame_y = screen_height*0.6
-    # pic_frame_x = frame_x - screen_width*0.01
-    # pic_frame_y = frame_y - screen_width*0.01
-    # i = 0
-
-    # Draw frames on the wall before adding images to them
-    # while (i < 3):
-    #     general_sprites.add(ThumbnailSprite(pic_frame_x, pic_frame_y, os.getcwd() + '/data/frame.png', screen_width*0.22, screen_width*0.22))
-    #     pic_frame_x += screen_width*0.25
-    #     i += 1
 
 
     for keepsake_entry in built_sprites:
