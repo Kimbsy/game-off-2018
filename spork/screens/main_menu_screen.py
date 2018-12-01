@@ -77,7 +77,7 @@ def main_menu_loop(game_state):
         ),
     )
 
-    prompt = TextSprite( (0.43*screen_width) , 0.62 *screen_height, 400, 30, "Enter Company Name", (255,255,255))
+    prompt = TextSprite((0.43*screen_width) , 0.62 *screen_height, 400, 30, "Enter Company Name", text_color=(255,255,255), arcade_font=True)
     prompt.rect.centerx = (screen_width/2)
     name_prompt = pygame.sprite.Group()
     name_prompt.add(prompt)

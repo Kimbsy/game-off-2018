@@ -219,13 +219,16 @@ class TextSprite(BaseSprite):
     """Displays text wrapping lines within the bounding rectangle.
     """
 
-    def __init__(self, x, y, w, h, text, text_color=(0, 0, 0)):
+    def __init__(self, x, y, w, h, text, text_color=(0, 0, 0), arcade_font=False):
         self.w = w
         self.h = h
         self.text = text
 
         # Define button text font.
-        self.font = pygame.font.Font("ARCADECLASSIC.TTF", 40)
+        if arcade_font:
+            self.font = pygame.font.Font("ARCADECLASSIC.TTF", 40)
+        else:
+            self.font = pygame.font.SysFont(None, 30)
         self.text_color = text_color
         
         # Call the parent constructor.
